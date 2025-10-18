@@ -29,4 +29,4 @@ docs2/
 # IDEA from jetbrains
 .idea/
 # VScode from Microsoft
-.vscode/*.json
+.vscode/
