@@ -65,7 +65,7 @@ Opis: Jako użytkownik chcę wprowadzić tekst źródłowy oraz ustawić paramet
 Kryteria akceptacji:
 - Użytkownik wprowadza tekst oraz parametry w interfejsie.
 - System wywołuje funkcję generowania AI i w odpowiednim czasie prezentuje listę wygenerowanych fiszek.
-- Wygenerowane fiszki odpowiadają ustalonym limitom (10–15 dla 1000 słów, 30–50 dla 10000 słów).
+- Wygenerowane fiszki odpowiadają ustalonym limitom (10–15 dla 1000 znaków, 30–50 dla 10000 znaków).
 - Użytkownik może zaakceptować pojedynczą fiszkę lub całą listę.
 
 ### US-003
@@ -75,6 +75,7 @@ Opis: Jako użytkownik chcę móc samodzielnie tworzyć fiszki, aby mieć pełn�
 Kryteria akceptacji:
 - Interfejs umożliwia dodanie nowej fiszki z pełną możliwością edycji treści.
 - Użytkownik może zapisać nowo utworzoną fiszkę oraz później ją edytować lub usunąć.
+- Podczas tworzenia fiszki ręcznie powinna być weryfikacja dlugosci `front` (maksymalnie 200 znaków), `back` (maksymalnie 500 znaków), `source` powinien być ustawiony jako `manual`
 
 ### US-004
 ID: US-004  
