@@ -58,6 +58,12 @@ export interface DeckDTO {
   user_id: DeckRow["user_id"];
 }
 
+// DTO reprezentujący listę decków z paginacją
+export interface DeckListDTO {
+  decks: DeckDTO[];
+  pagination: PaginationDTO;
+}
+
 // Komenda utworzenia decka (pola wymagane w zapytaniu)
 export interface CreateDeckCommand {
   title: DeckRow["title"];
@@ -68,6 +74,19 @@ export interface CreateDeckCommand {
 export interface UpdateDeckCommand {
   title?: DeckRow["title"];
   metadata?: DeckRow["metadata"];
+}
+
+/*
+ * Pagination and Filtering
+ */
+
+// DTO reprezentujący parametry paginacji z filtrowaniem
+export interface PaginationDTO {
+  page: number;
+  limit: number;
+  total: number;
+  sort?: string;
+  filter?: string;
 }
 
 export type Source = "manual" | "ai-full" | "ai-edited";
@@ -90,20 +109,35 @@ export interface FlashcardDTO {
   updated_at: FlashcardRow["updated_at"];
 }
 
+// DTO reprezentujący listę flashcards z paginacją
+export interface FlashcardListDTO {
+  flashcards: FlashcardDTO[];
+  pagination: PaginationDTO;
+}
+
+// DTO reprezentujący pojedynczą flashcard do utworzenia (bez source, który jest ustawiany automatycznie)
+export interface FlashcardCreateDTO {
+  type: Type;
+  front: string;
+  back: string;
+  source: Source;
+  generation_id: number | null;
+  deck_id: string;
+}
+
 // Komenda utworzenia flashcard (żądanie ręczne)
-export interface CreateFlashcardCommand {
-  type: FlashcardRow["type"];
-  front: FlashcardRow["front"];
-  back: FlashcardRow["back"];
-  source: FlashcardRow["source"];
+export interface CreateFlashcardsCommand {
+  flashcards: FlashcardCreateDTO[];
 }
 
 // Komenda aktualizacji flashcard (pola opcjonalne)
 export interface UpdateFlashcardCommand {
-  type?: FlashcardRow["type"];
+  type?: Type;
   front?: FlashcardRow["front"];
   back?: FlashcardRow["back"];
-  source?: FlashcardRow["source"];
+  source?: Source;
+  generation_id?: number | null;
+  deck_id?: string;
 }
 
 /*
@@ -116,9 +150,8 @@ export interface GenerateFlashcardsCommand {
 }
 
 // DTO reprezentujący wynik generacji flashcards
-export interface GenerationDTO {
+export interface GenerationResponseDTO {
   generation_id: GenerationRow["id"]; // alias dla pola id z tabeli generations
-  user_id: GenerationRow["user_id"];
   flashcards: FlashcardDTO[]; // lista wygenerowanych flashcards
   created_at: GenerationRow["created_at"];
   flashcards_count: GenerationRow["flashcards_count"];
