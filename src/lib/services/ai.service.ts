@@ -18,6 +18,10 @@ export async function generateFlashcardsWithAI(text: string): Promise<AIFlashcar
 
   // Calculate expected number of flashcards based on text length
   // 1000 chars = 10-15 flashcards, 10000 chars = 30-50 flashcards
+  const textLength = text.length;
+
+  console.info("Text length:", textLength);
+
   const flashcardsCount = 3;
 
   // Generate mock flashcards
