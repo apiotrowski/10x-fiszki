@@ -150,7 +150,7 @@ export interface GenerateFlashcardsCommand {
 }
 
 // DTO reprezentujący wynik generacji flashcards
-export interface GenerationFlashcardsResponseDTO {
+export interface GenerateFlashcardsResponseDTO {
   generation_id: GenerationRow["id"];
   generation_count: number;
   flashcard_proposals: FlashcardProposalDTO[];

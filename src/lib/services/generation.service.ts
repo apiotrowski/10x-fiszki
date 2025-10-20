@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { GenerationFlashcardsResponseDTO, FlashcardProposalDTO, Model } from "../../types";
+import type { GenerateFlashcardsResponseDTO, FlashcardProposalDTO, Model } from "../../types";
 import { generateFlashcardsWithAI } from "./ai.service";
 import { calculateTextHash, calculateTextLength } from "../utils";
 
@@ -46,7 +46,7 @@ async function checkDailyLimit(supabase: SupabaseClient, userId: string): Promis
 export async function generateFlashcards(
   supabase: SupabaseClient,
   params: GenerateFlashcardsParams
-): Promise<GenerationFlashcardsResponseDTO> {
+): Promise<GenerateFlashcardsResponseDTO> {
   const { text, deckId, userId } = params;
   const startTime = Date.now();
 
@@ -99,7 +99,7 @@ export async function generateFlashcards(
   }));
 
   // Step 7: Return response with proposals
-  const response: GenerationFlashcardsResponseDTO = {
+  const response: GenerateFlashcardsResponseDTO = {
     generation_id: generationData?.id || "",
     generation_count: aiFlashcards.length,
     flashcard_proposals: flashcardProposals,

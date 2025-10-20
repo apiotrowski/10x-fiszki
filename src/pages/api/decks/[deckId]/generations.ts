@@ -3,7 +3,7 @@ import { generateFlashcardsSchema } from "../../../../lib/validations/generation
 import { verifyDeckOwnership } from "../../../../lib/auth.helper";
 import { DEFAULT_USER_ID } from "../../../../db/supabase.client";
 import { generateFlashcards } from "../../../../lib/services/generation.service";
-import type { GenerationFlashcardsResponseDTO } from "../../../../types";
+import type { GenerateFlashcardsResponseDTO } from "../../../../types";
 
 export const prerender = false;
 
@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
   // Step 3: Call generation service to generate flashcards
   try {
-    const generationResult: GenerationFlashcardsResponseDTO = await generateFlashcards(supabase, {
+    const generationResult: GenerateFlashcardsResponseDTO = await generateFlashcards(supabase, {
       text,
       deckId,
       userId,

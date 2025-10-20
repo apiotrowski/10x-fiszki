@@ -39,9 +39,9 @@ The `generation.service.ts` needs to be updated to align with the business requi
   ```
 
 **Output Types:**
-- `GenerationFlashcardsResponseDTO` - Response containing flashcard proposals
+- `GenerateFlashcardsResponseDTO` - Response containing flashcard proposals
   ```typescript
-  export interface GenerationFlashcardsResponseDTO {
+  export interface GenerateFlashcardsResponseDTO {
     generation_id: GenerationRow["id"];
     generation_count: number;
     flashcard_proposals: FlashcardProposalDTO[];
@@ -467,7 +467,7 @@ Update main function:
 export async function generateFlashcards(
   supabase: SupabaseClient,
   params: GenerateFlashcardsParams
-): Promise<GenerationFlashcardsResponseDTO> {
+): Promise<GenerateFlashcardsResponseDTO> {
   const { text, deckId, userId } = params;
   const startTime = Date.now();
 
@@ -517,7 +517,7 @@ export async function generateFlashcards(
   }));
 
   // Step 7: Return response with proposals (UPDATED)
-  const response: GenerationFlashcardsResponseDTO = {
+  const response: GenerateFlashcardsResponseDTO = {
     generation_id: generationData?.id || "",
     generation_count: aiFlashcards.length,
     flashcard_proposals: flashcardProposals,
@@ -619,7 +619,7 @@ Ensure correct imports:
 ```typescript
 import type { SupabaseClient } from "../../db/supabase.client";
 import type {
-  GenerationFlashcardsResponseDTO,
+  GenerateFlashcardsResponseDTO,
   FlashcardProposalDTO,
   Model,
 } from "../../types";

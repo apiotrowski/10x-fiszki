@@ -107,7 +107,7 @@ curl -X POST http://localhost:4321/api/decks/{deckId}/generations \
 ✅ Mocked AI service (ready for OpenAI integration)
 ✅ Database operations (flashcards + generation metadata)
 ✅ Error handling with proper HTTP codes
-✅ Response using GenerationFlashcardsResponseDTO
+✅ Response using GenerateFlashcardsResponseDTO
 
 ## Next Steps
 

@@ -14,7 +14,7 @@ Endpoint odpowiada za generowanie fiszek przy użyciu AI (GPT-4o-mini) dla okre�
 ## 3. Wykorzystywane typy
 - DTO/Command modele:
   - GenerateFlashcardsCommand (dla wejściowego tekstu, ewentualnie rozszerzony o dodatkowe parametry w przyszłości, np. opcjonalne ustawienie trudności)
-  - GenerationFlashcardsResponseDTO (zawiera generation_id, generation_count, flashcard_proposals, created_at)
+  - GenerateFlashcardsResponseDTO (zawiera generation_id, generation_count, flashcard_proposals, created_at)
   - FlashcardProposalDTO (dla pojedynczych propozycji fiszek)
 
 ## 4. Przepływ danych
@@ -29,7 +29,7 @@ Endpoint odpowiada za generowanie fiszek przy użyciu AI (GPT-4o-mini) dla okre�
 5. W przypadku powodzenia, zapisywane są:
    - Nowe rekordy fiszek w tabeli flashcards (z `source` ustawionym na `ai-full` i przypisaniem do deckId)
    - Rekord generacji w tabeli generations (metadane, takie jak user_id, model użyty, liczba fiszek, czas generacji)
-6. W odpowiedzi zwracany jest status 201 Created oraz obiekt GenerationFlashcardsResponseDTO.
+6. W odpowiedzi zwracany jest status 201 Created oraz obiekt GenerateFlashcardsResponseDTO.
 7. Jeśli serwis AI zwróci błąd (503), użytkownik otrzyma komunikat sugerujący ręczną realizację fiszek jako fallback.
 
 ## 5. Względy bezpieczeństwa
