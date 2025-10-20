@@ -162,3 +162,35 @@ export async function listDecks(
     pagination,
   };
 }
+
+/**
+ * Service for deleting a deck by its ID
+ * Validates that the deck exists and belongs to the specified user before deletion
+ * Flashcards are automatically deleted via cascade delete constraint in the database
+ *
+ * @param supabase - Supabase client instance
+ * @param deckId - UUID of the deck to delete
+ * @param userId - UUID of the authenticated user
+ * @throws Error if deck not found, doesn't belong to user, or deletion fails
+ */
+export async function deleteDeck(supabase: SupabaseClient, deckId: string, userId: string): Promise<void> {
+  // Delete the deck with both id and user_id filters
+  // This ensures authorization check is done at the database level
+  // Cascade delete will automatically remove associated flashcards
+  const { error, count } = await supabase
+    .from("decks")
+    .delete({ count: "exact" })
+    .eq("id", deckId)
+    .eq("user_id", userId);
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("Database error deleting deck:", error);
+    throw new Error(`Failed to delete deck: ${error.message}`);
+  }
+
+  // If no rows were affected, the deck doesn't exist or doesn't belong to the user
+  if (count === 0) {
+    throw new Error("Deck not found or you do not have permission to delete it");
+  }
+}

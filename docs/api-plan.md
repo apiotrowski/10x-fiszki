@@ -190,12 +190,51 @@
    - **Success Codes:** 200 OK
    - **Error Codes:** 400 Bad Request, 404 Not Found, 401 Unauthorized
 
-5. **Delete Deck**
+5. **Delete Deck** ✅ IMPLEMENTED
    - **Method:** DELETE
    - **URL:** `/api/decks/{deckId}`
-   - **Description:** Delete a deck and cascade delete related flashcards.
+   - **Description:** Delete a specific deck and all associated flashcards (cascade delete).
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId].ts`
+   - **Service Layer:** Uses `deleteDeck` service from `/src/lib/services/deck.service.ts`
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck to delete
+   - **Response:** No response body (204 No Content on success)
    - **Success Codes:** 204 No Content
-   - **Error Codes:** 404 Not Found, 401 Unauthorized
+   - **Error Codes:**
+     - 400 Bad Request (invalid UUID format)
+     - 404 Not Found (deck not found or unauthorized)
+     - 401 Unauthorized (not authenticated)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/deck.validation.ts`)
+     - `deckId` must be a valid UUID v4 format
+   - **Key Implementation Details:**
+     - Deletes deck with user authorization check at database level
+     - Automatically deletes all associated flashcards via foreign key cascade delete
+     - Verifies deletion success using row count
+     - Returns 204 No Content (no response body) on success
+     - Idempotent operation (deleting already deleted deck returns 404)
+     - Full TypeScript type safety (deleteDeck returns void)
+   - **Security Features:**
+     - Authorization check at database level (user_id filter)
+     - Returns 404 instead of 403 for unauthorized access (prevents information disclosure)
+     - UUID validation prevents injection attacks
+     - Parameterized queries via Supabase client
+     - Users can only delete their own decks
+   - **Performance Optimizations:**
+     - Single database query (DELETE with authorization check)
+     - Database indexes on `id` and `user_id` columns
+     - Cascade delete handled by database (no application-level queries for flashcards)
+     - Row count verification without extra SELECT query
+   - **Cascade Delete Behavior:**
+     - Foreign key constraint on `flashcards.deck_id` with `ON DELETE CASCADE`
+     - All flashcards automatically removed when deck is deleted
+     - Atomic operation ensures no orphaned records
+     - Database enforces referential integrity
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/delete-deck-plan.md`
+     - Implementation Summary: `/docs/planning/delete-deck-implementation-summary.md`
+     - Examples: `/docs/examples/delete-deck-example.md`
+     - Test Cases: `/docs/testing/delete-deck-test-cases.md`
 
 ### B. Flashcards Management
 
