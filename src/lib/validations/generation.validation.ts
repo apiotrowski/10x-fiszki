@@ -63,3 +63,23 @@ export const createFlashcardsSchema = z.object({
 
 export type FlashcardProposal = z.infer<typeof flashcardProposalSchema>;
 export type CreateFlashcardsInput = z.infer<typeof createFlashcardsSchema>;
+
+/**
+ * Validation schema for listing flashcards query parameters
+ */
+export const listFlashcardsQuerySchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1))
+    .pipe(z.number().int().positive("Page must be a positive integer")),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 10))
+    .pipe(z.number().int().positive("Limit must be a positive integer").max(100, "Limit cannot exceed 100")),
+  sort: z.enum(["created_at", "updated_at"]).optional().default("created_at"),
+  filter: z.enum(["question-answer", "gaps", "manual", "ai-full", "ai-edited"]).optional(),
+});
+
+export type ListFlashcardsQuery = z.infer<typeof listFlashcardsQuerySchema>;

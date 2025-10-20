@@ -29,10 +29,12 @@
    - **Success Codes:** 200 OK
    - **Error Codes:** 401 Unauthorized
 
-2. **Create Deck**
+2. **Create Deck** ✅ IMPLEMENTED
    - **Method:** POST
    - **URL:** `/api/decks`
-   - **Description:** Create a new deck. Enforce daily deck creation limit as per business rules (MVP limit: max 5 per day).
+   - **Description:** Create a new deck for the authenticated user.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/index.ts`
+   - **Service Layer:** Uses `createDeck` service from `/src/lib/services/deck.service.ts`
    - **Request Payload:**
      ```json
      {
@@ -52,15 +54,79 @@
      }
      ```
    - **Success Codes:** 201 Created
-   - **Error Codes:** 400 Bad Request, 401 Unauthorized, 429 Too Many Requests (if daily limit exceeded)
+   - **Error Codes:** 
+     - 400 Bad Request (invalid JSON, validation errors)
+     - 401 Unauthorized (not authenticated)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/deck.validation.ts`)
+     - `title` is required, must be 1-100 characters (trimmed)
+     - `metadata` is optional, defaults to empty object
+   - **Key Implementation Details:**
+     - Validates input before database interaction
+     - Creates deck with user association
+     - Returns complete deck information with generated ID and timestamps
+     - Clean error handling with descriptive messages
+   - **Security Features:**
+     - Authentication required via JWT token
+     - Users can only create decks for themselves
+     - Input validation prevents injection attacks
+     - Parameterized queries for SQL injection prevention
+   - **Performance:**
+     - Single database query (INSERT)
+     - Response time typically < 200ms
+     - Transaction safety with atomic insert operation
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/create-deck-plan.md`
+     - Examples & Testing: `/docs/examples/create-deck-example.md`
 
-3. **Get Deck Details**
+3. **Get Deck Details** ✅ IMPLEMENTED
    - **Method:** GET
    - **URL:** `/api/decks/{deckId}`
-   - **Description:** Retrieve details for a specific deck.
-   - **Response Payload:** Same as the create deck response.
+   - **Description:** Retrieve details for a specific deck owned by the authenticated user.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId].ts`
+   - **Service Layer:** Uses `getDeckById` service from `/src/lib/services/deck.service.ts`
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck to retrieve
+   - **Response Payload:**
+     ```json
+     {
+         "id": "uuid",
+         "title": "Deck Title",
+         "metadata": {
+             "description": "Optional description",
+             "tags": ["tag1", "tag2"]
+         },
+         "created_at": "2025-10-20T12:00:00Z",
+         "updated_at": "2025-10-20T12:00:00Z",
+         "user_id": "uuid"
+     }
+     ```
    - **Success Codes:** 200 OK
-   - **Error Codes:** 404 Not Found, 401 Unauthorized
+   - **Error Codes:** 
+     - 400 Bad Request (invalid UUID format or missing deckId)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck doesn't exist or no permission)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/deck.validation.ts`)
+     - `deckId` must be a valid UUID v4 format
+   - **Key Implementation Details:**
+     - Validates deckId format before querying database
+     - Validates deck ownership using combined query (id + user_id)
+     - Returns 404 (not 403) for unauthorized access to prevent information disclosure
+     - Efficient single-query approach for both existence and ownership check
+     - Full TypeScript type safety with DeckDTO
+   - **Security Features:**
+     - Authorization check at database level (prevents unauthorized access)
+     - No information disclosure (same 404 response for non-existent and unauthorized)
+     - UUID validation prevents injection attacks
+     - Parameterized queries for SQL injection prevention
+   - **Performance Optimizations:**
+     - Single database query using composite WHERE clause
+     - Database indexes on `id` and `user_id` columns
+     - Selective field retrieval (only necessary columns)
+   - **Documentation:**
+     - Implementation Plan: `/docs/get-deck-plan.md`
+     - Test Cases: `/docs/testing/get-deck-test-cases.md`
 
 4. **Update Deck**
    - **Method:** PUT
@@ -85,27 +151,67 @@
 
 ### B. Flashcards Management
 
-1. **List Flashcards in a Deck**
+1. **List Flashcards in a Deck** ✅ IMPLEMENTED
    - **Method:** GET
    - **URL:** `/api/decks/{deckId}/flashcards`
-   - **Description:** Retrieve a paginated list of flashcards associated with a specific deck.
+   - **Description:** Retrieve flashcards for a specific deck with pagination, filtering, and sorting support.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId]/flashcards.ts`
+   - **Service Layer:** Uses `getFlashcards` service from `/src/lib/services/flashcard.service.ts`
    - **Query Parameters:**
-     - `page` (optional)
-     - `limit` (optional)
-     - `sort` (optional, e.g. by created_at)
-     - `filter` (optional, e.g. by type)
+     - `page` (optional, default: 1, min: 1) - Page number for pagination
+     - `limit` (optional, default: 10, min: 1, max: 100) - Items per page
+     - `sort` (optional, default: "created_at") - Sort field: `created_at` or `updated_at`
+     - `filter` (optional) - Filter by type or source: `question-answer`, `gaps`, `manual`, `ai-full`, `ai-edited`
    - **Response Payload:**
      ```json
      {
          "flashcards": [
-             { "id": "uuid", "deck_id": "uuid", "type": "question-answer", "source": "manual", "front": "Question?", "back": "Answer.", "created_at": "timestamp", "updated_at": "timestamp" }
+             { 
+                 "id": "uuid", 
+                 "deck_id": "uuid", 
+                 "type": "question-answer", 
+                 "source": "manual", 
+                 "front": "Question?", 
+                 "back": "Answer.", 
+                 "created_at": "timestamp", 
+                 "updated_at": "timestamp" 
+             }
          ],
-         "page": 1,
-         "totalPages": 3
+         "pagination": {
+             "page": 1,
+             "limit": 10,
+             "total": 47,
+             "sort": "created_at",
+             "filter": "question-answer"
+         }
      }
      ```
    - **Success Codes:** 200 OK
-   - **Error Codes:** 404 Not Found, 401 Unauthorized
+   - **Error Codes:** 
+     - 400 Bad Request (invalid query parameters)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck doesn't exist or no permission)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/generation.validation.ts`)
+     - `page` must be a positive integer
+     - `limit` must be between 1 and 100
+     - `sort` must be either "created_at" or "updated_at"
+     - `filter` must be one of: "question-answer", "gaps", "manual", "ai-full", "ai-edited"
+   - **Key Implementation Details:**
+     - Validates deck ownership before allowing flashcard access
+     - Uses composite database indexes for optimal query performance
+     - Supports filtering by both flashcard type and source
+     - Results sorted descending (newest first) for better UX
+     - Returns accurate total count even with filters applied
+     - Efficient pagination using LIMIT and OFFSET
+   - **Performance Optimizations:**
+     - Composite indexes on (deck_id, created_at), (deck_id, updated_at)
+     - Composite indexes on (deck_id, type), (deck_id, source)
+     - Database migration: `/supabase/migrations/20251021130000_add_flashcards_sorting_indexes.sql`
+   - **Documentation:**
+     - Quick Reference: `/docs/quick-reference-flashcards-api.md`
+     - Detailed Examples: `/docs/examples/list-flashcards-example.md`
+     - Test Cases: `/docs/testing/list-flashcards-test-cases.md`
 
 2. **Create Flashcards (Bulk Creation)** ✅ IMPLEMENTED
    - **Method:** POST

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { FlashcardDTO, FlashcardProposalDTO } from "../../types";
+import type { FlashcardDTO, FlashcardProposalDTO, FlashcardListDTO } from "../../types";
 
 interface CreateFlashcardsParams {
   flashcards: FlashcardProposalDTO[];
@@ -9,6 +9,14 @@ interface CreateFlashcardsParams {
 interface CreateFlashcardsResult {
   flashcards: FlashcardDTO[];
   count: number;
+}
+
+interface GetFlashcardsParams {
+  deckId: string;
+  page: number;
+  limit: number;
+  sort?: "created_at" | "updated_at";
+  filter?: "question-answer" | "gaps" | "manual" | "ai-full" | "ai-edited";
 }
 
 /**
@@ -176,4 +184,73 @@ export async function getFlashcardsByDeck(supabase: SupabaseClient, deckId: stri
       updated_at: flashcard.updated_at,
     })) || []
   );
+}
+
+/**
+ * Service for getting paginated flashcards with optional filtering and sorting
+ * Implements pagination, filtering by type/source, and sorting
+ *
+ * @param supabase - Supabase client instance
+ * @param params - Query parameters including pagination, sort, and filter options
+ * @returns FlashcardListDTO with flashcards and pagination metadata
+ * @throws Error if query fails
+ */
+export async function getFlashcards(supabase: SupabaseClient, params: GetFlashcardsParams): Promise<FlashcardListDTO> {
+  const { deckId, page, limit, sort = "created_at", filter } = params;
+
+  // Calculate offset for pagination
+  const offset = (page - 1) * limit;
+
+  // Build query with deck_id filter
+  let query = supabase.from("flashcards").select("*", { count: "exact" }).eq("deck_id", deckId);
+
+  // Apply optional filter
+  // Filter can be by type (question-answer, gaps) or source (manual, ai-full, ai-edited)
+  if (filter) {
+    if (filter === "question-answer" || filter === "gaps") {
+      query = query.eq("type", filter);
+    } else if (filter === "manual" || filter === "ai-full" || filter === "ai-edited") {
+      query = query.eq("source", filter);
+    }
+  }
+
+  // Apply sorting (descending by default for better UX - newest first)
+  query = query.order(sort, { ascending: false });
+
+  // Apply pagination
+  query = query.range(offset, offset + limit - 1);
+
+  // Execute query
+  const { data, error, count } = await query;
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("Database error fetching flashcards:", error);
+    throw new Error(`Failed to fetch flashcards: ${error.message}`);
+  }
+
+  // Map data to FlashcardDTO format
+  const flashcards: FlashcardDTO[] =
+    data?.map((flashcard) => ({
+      id: flashcard.id,
+      deck_id: flashcard.deck_id,
+      type: flashcard.type as "question-answer" | "gaps",
+      front: flashcard.front,
+      back: flashcard.back,
+      source: flashcard.source as "manual" | "ai-full" | "ai-edited",
+      created_at: flashcard.created_at,
+      updated_at: flashcard.updated_at,
+    })) || [];
+
+  // Return FlashcardListDTO with pagination metadata
+  return {
+    flashcards,
+    pagination: {
+      page,
+      limit,
+      total: count || 0,
+      sort,
+      filter,
+    },
+  };
 }

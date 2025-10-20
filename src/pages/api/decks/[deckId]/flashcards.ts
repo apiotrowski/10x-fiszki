@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
-import { createFlashcardsSchema } from "../../../../lib/validations/generation.validation";
+import { createFlashcardsSchema, listFlashcardsQuerySchema } from "../../../../lib/validations/generation.validation";
 import { verifyDeckOwnership } from "../../../../lib/auth.helper";
 import { DEFAULT_USER_ID } from "../../../../db/supabase.client";
-import { createFlashcards } from "../../../../lib/services/flashcard.service";
+import { createFlashcards, getFlashcards } from "../../../../lib/services/flashcard.service";
 
 export const prerender = false;
 
@@ -114,6 +114,109 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return new Response(
       JSON.stringify({
         error: "Failed to create flashcards",
+        message: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};
+
+/**
+ * GET /api/decks/{deckId}/flashcards
+ * List flashcards in a deck with pagination, filtering, and sorting
+ * Query parameters: page, limit, sort, filter (all optional)
+ */
+export const GET: APIRoute = async ({ params, request, locals }) => {
+  const supabase = locals.supabase;
+  const { deckId } = params;
+  const userId = DEFAULT_USER_ID;
+
+  // Step 1: Validate deckId parameter
+  if (!deckId) {
+    return new Response(
+      JSON.stringify({
+        error: "Deck ID is required",
+      }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  // Step 2: Verify deck ownership
+  const ownsDeck = await verifyDeckOwnership(supabase, deckId, userId);
+
+  if (!ownsDeck) {
+    return new Response(
+      JSON.stringify({
+        error: "Deck not found or you do not have permission to access it.",
+      }),
+      {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  // Step 3: Extract and validate query parameters
+  const url = new URL(request.url);
+  const queryParams = {
+    page: url.searchParams.get("page") || undefined,
+    limit: url.searchParams.get("limit") || undefined,
+    sort: url.searchParams.get("sort") || undefined,
+    filter: url.searchParams.get("filter") || undefined,
+  };
+
+  // Validate query parameters with Zod schema
+  const validationResult = listFlashcardsQuerySchema.safeParse(queryParams);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.errors.map((err) => ({
+      field: err.path.join("."),
+      message: err.message,
+    }));
+
+    return new Response(
+      JSON.stringify({
+        error: "Invalid query parameters",
+        details: errors,
+      }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  const { page, limit, sort, filter } = validationResult.data;
+
+  // Step 4: Fetch flashcards from database with pagination
+  try {
+    const result = await getFlashcards(supabase, {
+      deckId,
+      page,
+      limit,
+      sort,
+      filter,
+    });
+
+    // Step 5: Return successful response
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    // Generic error handling for unexpected exceptions
+    // eslint-disable-next-line no-console
+    console.error("Error fetching flashcards:", error);
+
+    return new Response(
+      JSON.stringify({
+        error: "Failed to fetch flashcards",
         message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
