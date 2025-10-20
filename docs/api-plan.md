@@ -11,23 +11,71 @@
 
 ### A. Decks Management
 
-1. **List Decks**
+1. **List Decks** ✅ IMPLEMENTED
    - **Method:** GET
    - **URL:** `/api/decks`
-   - **Description:** Retrieve a paginated list of decks for the authenticated user.
+   - **Description:** Retrieve a paginated list of decks for the authenticated user with filtering and sorting support.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/index.ts`
+   - **Service Layer:** Uses `listDecks` service from `/src/lib/services/deck.service.ts`
    - **Query Parameters:**
-     - `page` (optional, default: 1)
-     - `limit` (optional, default: 10)
+     - `page` (optional, default: 1, min: 1) - Page number for pagination
+     - `limit` (optional, default: 10, min: 1, max: 100) - Items per page
+     - `sort` (optional, default: "created_at") - Sort field: `created_at`, `updated_at`, or `title`
+     - `filter` (optional) - Case-insensitive search term to filter by deck title
    - **Response Payload:**
      ```json
      {
-         "decks": [{ "id": "uuid", "title": "Deck Title", "metadata": {}, "created_at": "timestamp", "updated_at": "timestamp" }],
-         "page": 1,
-         "totalPages": 5
+         "decks": [
+             { 
+                 "id": "uuid", 
+                 "title": "Deck Title", 
+                 "metadata": {}, 
+                 "created_at": "timestamp", 
+                 "updated_at": "timestamp",
+                 "user_id": "uuid"
+             }
+         ],
+         "pagination": {
+             "page": 1,
+             "limit": 10,
+             "total": 50,
+             "sort": "created_at",
+             "filter": "optional search term"
+         }
      }
      ```
    - **Success Codes:** 200 OK
-   - **Error Codes:** 401 Unauthorized
+   - **Error Codes:** 
+     - 400 Bad Request (invalid query parameters)
+     - 401 Unauthorized (not authenticated)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/deck.validation.ts`)
+     - `page` must be a positive integer
+     - `limit` must be between 1 and 100
+     - `sort` must be one of: "created_at", "updated_at", "title"
+     - `filter` is optional and performs case-insensitive title search
+   - **Key Implementation Details:**
+     - Returns decks belonging to authenticated user only (filtered by user_id)
+     - Uses offset-based pagination with efficient range queries
+     - Case-insensitive title filtering using `ilike()` for better UX
+     - All sorts are descending (newest/latest first)
+     - Returns accurate total count for pagination metadata
+     - Empty results return empty array (not an error)
+     - Full TypeScript type safety with DeckDTO and DeckListDTO
+   - **Security Features:**
+     - Authorization check at database level (users only see own decks)
+     - SQL injection protection via Supabase parameterized queries
+     - Input validation prevents malformed queries
+     - No information disclosure about other users' decks
+   - **Performance Optimizations:**
+     - Database index on `user_id` column (`idx_decks_user_id`)
+     - Efficient pagination using `range()` method
+     - Selective field retrieval (only necessary columns)
+     - Total count calculated using `{ count: "exact" }`
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/list-deck-plan.md`
+     - Implementation Summary: `/docs/planning/list-deck-implementation-summary.md`
+     - Examples & Testing: `/docs/examples/list-decks-example.md`
 
 2. **Create Deck** ✅ IMPLEMENTED
    - **Method:** POST

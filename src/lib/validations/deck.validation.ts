@@ -20,3 +20,30 @@ export const createDeckSchema = z.object({
     .trim(),
   metadata: z.record(z.unknown()).optional().default({}),
 });
+
+/**
+ * Validation schema for listing decks query parameters
+ * Validates pagination parameters: page, limit, sort, and filter
+ */
+export const listDecksQuerySchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1))
+    .pipe(z.number().int().positive("Page must be a positive integer")),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 10))
+    .pipe(
+      z
+        .number()
+        .int()
+        .positive("Limit must be a positive integer")
+        .max(100, "Limit cannot exceed 100")
+    ),
+  sort: z.enum(["created_at", "updated_at", "title"]).optional().default("created_at"),
+  filter: z.string().optional(),
+});
+
+export type ListDecksQuery = z.infer<typeof listDecksQuerySchema>;
