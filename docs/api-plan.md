@@ -107,10 +107,12 @@
    - **Success Codes:** 200 OK
    - **Error Codes:** 404 Not Found, 401 Unauthorized
 
-2. **Create Flashcards (Bulk Creation)**
+2. **Create Flashcards (Bulk Creation)** ✅ IMPLEMENTED
    - **Method:** POST
    - **URL:** `/api/decks/{deckId}/flashcards`
    - **Description:** Create multiple flashcards at once in a specified deck. Supports both manual and AI-generated flashcards.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId]/flashcards.ts`
+   - **Service Layer:** Uses `createFlashcards` service from `/src/lib/services/flashcard.service.ts`
    - **Request Payload:**
      ```json
      {
@@ -141,14 +143,24 @@
      }
      ```
    - **Success Codes:** 201 Created
-   - **Error Codes:** 400 Bad Request (e.g., invalid type, empty array, validation errors), 401 Unauthorized, 404 Not Found
-   - **Validation rules:**
-     - `flashcards` array must not be empty
+   - **Error Codes:** 
+     - 400 Bad Request (invalid JSON, empty array, validation errors)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck doesn't exist or no permission)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation rules:** (implemented via Zod schema in `/src/lib/validations/generation.validation.ts`)
+     - `flashcards` array must not be empty (minimum 1 flashcard)
      - each flashcard must have valid `type` (available types: `question-answer`, `gaps`)
      - each flashcard must have valid `source` (available types: `manual`, `ai-full`)
-     - check length of `front` (max 200 characters)
-     - check length of `back` (max 500 characters)
+     - `front` content: minimum 1 character, maximum 200 characters
+     - `back` content: minimum 1 character, maximum 500 characters
      - maximum 100 flashcards per request
+   - **Key Implementation Details:**
+     - Validates deck ownership before allowing flashcard creation
+     - Uses bulk insertion for optimal database performance
+     - Returns created flashcards with generated IDs and timestamps
+     - Implements comprehensive error handling with clear error messages
+     - Service layer handles all database interactions for better code organization
 
 3. **Update Flashcard**
    - **Method:** PUT
@@ -172,7 +184,7 @@
 
 ### D. AI-Driven Flashcard Generation
 
-1. **Generate Flashcards**
+1. **Generate Flashcards** ✅ IMPLEMENTED
    - **Method:** POST
    - **URL:** `/api/decks/{deckId}/generations`
    - **Description:** Generate flashcards using AI based on input text. Returns proposed flashcards without saving them to database. Should enforce daily generation limits (max 10 per day) and fallback to manual mode if API fails.
@@ -202,8 +214,8 @@
      3. AI should generate both question-answer and gaps type flashcards
      4. Expected output: 10-15 flashcards for ~1000 characters, 30-50 flashcards for ~10000 characters (as per US-002)
      5. If AI API fails (503 error), system should inform user to use manual flashcard creation as fallback (US-007)
-     6. Record generation metadata in `generations` table (user_id, model used, flashcards_count, generation_duration)
-     7. Return flashcard proposals (without id, deck_id, created_at, updated_at fields) with generation metadata
+     6. Save to db information to `generations` table (user_id, model used, generation_count, generation_duration, source_text_length, source_text_hash)
+     7. Return flashcard proposals
      8. Flashcards are NOT saved to database at this stage
      9. User can then accept individual flashcards or the entire list (US-002) via the bulk create flashcards endpoint
 
