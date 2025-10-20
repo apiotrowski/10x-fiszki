@@ -91,26 +91,32 @@ export interface Database {
       generations: {
         Row: {
           created_at: string;
-          flashcards_count: number;
+          generation_count: number;
           generation_duration: unknown;
           id: string;
           model: string;
+          source_text_hash: string;
+          source_text_length: number;
           user_id: string;
         };
         Insert: {
           created_at?: string;
-          flashcards_count: number;
+          generation_count: number;
           generation_duration: unknown;
           id?: string;
           model: string;
+          source_text_hash: string;
+          source_text_length: number;
           user_id: string;
         };
         Update: {
           created_at?: string;
-          flashcards_count?: number;
+          generation_count?: number;
           generation_duration?: unknown;
           id?: string;
           model?: string;
+          source_text_hash?: string;
+          source_text_length?: number;
           user_id?: string;
         };
         Relationships: [];

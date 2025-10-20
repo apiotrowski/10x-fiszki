@@ -116,7 +116,7 @@ export interface FlashcardListDTO {
 }
 
 // DTO reprezentujący pojedynczą flashcard do utworzenia (bez source, który jest ustawiany automatycznie)
-export interface FlashcardCreateDTO {
+export interface FlashcardProposalDTO {
   type: Type;
   front: string;
   back: string;
@@ -127,7 +127,7 @@ export interface FlashcardCreateDTO {
 
 // Komenda utworzenia flashcard (żądanie ręczne)
 export interface CreateFlashcardsCommand {
-  flashcards: FlashcardCreateDTO[];
+  flashcards: FlashcardProposalDTO[];
 }
 
 // Komenda aktualizacji flashcard (pola opcjonalne)
@@ -150,11 +150,9 @@ export interface GenerateFlashcardsCommand {
 }
 
 // DTO reprezentujący wynik generacji flashcards
-export interface GenerationResponseDTO {
-  generation_id: GenerationRow["id"]; // alias dla pola id z tabeli generations
-  flashcards: FlashcardDTO[]; // lista wygenerowanych flashcards
+export interface GenerationFlashcardsResponseDTO {
+  generation_id: GenerationRow["id"];
+  generation_count: number;
+  flashcard_proposals: FlashcardProposalDTO[];
   created_at: GenerationRow["created_at"];
-  flashcards_count: GenerationRow["flashcards_count"];
-  generation_duration: GenerationRow["generation_duration"];
-  model: Model;
 }

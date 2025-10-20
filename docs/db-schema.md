@@ -35,7 +35,9 @@ This table should be managed by Supbase Auth
 - id: UUID PRIMARY KEY DEFAULT gen_random_uuid()
 - user_id: UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
 - model: VARCHAR(100) NOT NULL
-- flashcards_count: INTEGER NOT NULL
+- source_text_length: INTEGER NOT NULL
+- source_text_hash: VARCHAR(255) NOT NULL
+- generation_count: INTEGER NOT NULL
 - generation_duration: INTERVAL NOT NULL
 - created_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 

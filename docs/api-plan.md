@@ -9,52 +9,7 @@
 
 ## 2. Endpoints
 
-### A. User Authentication & Management
-
-1. **Register User**
-   - **Method:** POST
-   - **URL:** `/api/auth/register`
-   - **Description:** Register a new user with a unique email and password.
-   - **Request Payload:**
-     ```json
-     {
-         "email": "user@example.com",
-         "password": "securePassword"
-     }
-     ```
-   - **Response Payload:**
-     ```json
-     {
-         "id": "uuid",
-         "email": "user@example.com",
-         "created_at": "timestamp"
-     }
-     ```
-   - **Success Codes:** 201 Created
-   - **Error Codes:** 400 Bad Request (invalid data), 409 Conflict (email exists)
-
-2. **Login User**
-   - **Method:** POST
-   - **URL:** `/api/auth/login`
-   - **Description:** Login an existing user and provide an authentication token.
-   - **Request Payload:**
-     ```json
-     {
-         "email": "user@example.com",
-         "password": "securePassword"
-     }
-     ```
-   - **Response Payload:**
-     ```json
-     {
-         "token": "jwt_token",
-         "user": { "id": "uuid", "email": "user@example.com" }
-     }
-     ```
-   - **Success Codes:** 200 OK
-   - **Error Codes:** 401 Unauthorized, 400 Bad Request
-
-### B. Decks Management
+### A. Decks Management
 
 1. **List Decks**
    - **Method:** GET
@@ -128,7 +83,7 @@
    - **Success Codes:** 204 No Content
    - **Error Codes:** 404 Not Found, 401 Unauthorized
 
-### C. Flashcards Management
+### B. Flashcards Management
 
 1. **List Flashcards in a Deck**
    - **Method:** GET
@@ -152,27 +107,48 @@
    - **Success Codes:** 200 OK
    - **Error Codes:** 404 Not Found, 401 Unauthorized
 
-2. **Create Flashcard (Manual Creation)**
+2. **Create Flashcards (Bulk Creation)**
    - **Method:** POST
    - **URL:** `/api/decks/{deckId}/flashcards`
-   - **Description:** Manually create a new flashcard in a specified deck.
+   - **Description:** Create multiple flashcards at once in a specified deck. Supports both manual and AI-generated flashcards.
    - **Request Payload:**
      ```json
      {
-         "type": "question-answer",
-         "front": "What is...?",
-         "back": "It is...",
-         "source": "manual"
+         "flashcards": [
+             {
+                 "type": "question-answer",
+                 "front": "What is...?",
+                 "back": "It is...",
+                 "source": "manual"
+             },
+             {
+                 "type": "gaps",
+                 "front": "Fill in the blank: _____ is important.",
+                 "back": "[concept]",
+                 "source": "ai-full"
+             }
+         ]
      }
      ```
-   - **Response Payload:** 
-     Same structure as individual flashcard.
+   - **Response Payload:**
+     ```json
+     {
+         "flashcards": [
+             { "id": "uuid", "deck_id": "uuid", "type": "question-answer", "source": "manual", "front": "What is...?", "back": "It is...", "created_at": "timestamp", "updated_at": "timestamp" },
+             { "id": "uuid", "deck_id": "uuid", "type": "gaps", "source": "ai-full", "front": "Fill in the blank: _____ is important.", "back": "[concept]", "created_at": "timestamp", "updated_at": "timestamp" }
+         ],
+         "count": 2
+     }
+     ```
    - **Success Codes:** 201 Created
-   - **Error Codes:** 400 Bad Request (e.g., invalid type; valid types: question-answer, gaps), 401 Unauthorized, 404 Not Found
+   - **Error Codes:** 400 Bad Request (e.g., invalid type, empty array, validation errors), 401 Unauthorized, 404 Not Found
    - **Validation rules:**
+     - `flashcards` array must not be empty
+     - each flashcard must have valid `type` (available types: `question-answer`, `gaps`)
+     - each flashcard must have valid `source` (available types: `manual`, `ai-full`)
      - check length of `front` (max 200 characters)
      - check length of `back` (max 500 characters)
-     - check available type of flashards (available types: `question-answer`, `gaps`)
+     - maximum 100 flashcards per request
 
 3. **Update Flashcard**
    - **Method:** PUT
@@ -199,7 +175,7 @@
 1. **Generate Flashcards**
    - **Method:** POST
    - **URL:** `/api/decks/{deckId}/generations`
-   - **Description:** Generate flashcards using AI based on input text and parameters (number of flashcards, difficulty). Should enforce daily generation limits (max 10 per day) and fallback to manual mode if API fails.
+   - **Description:** Generate flashcards using AI based on input text. Returns proposed flashcards without saving them to database. Should enforce daily generation limits (max 10 per day) and fallback to manual mode if API fails.
    - **Request Payload:**
      ```json
      {
@@ -210,9 +186,10 @@
      ```json
      {
          "generation_id": "uuid",
-         "user_id": "uuid",
-         "flashcards": [
-             { "id": "uuid", "deck_id": "uuid", "type": "question-answer", "source": "ai-full", "front": "Question?", "back": "Answer.", "created_at": "timestamp" }
+         "generation_count": "number",
+         "flashcardProposals": [
+             { "type": "question-answer", "front": "Question?", "back": "Answer." },
+             { "type": "gaps", "front": "Fill in the blank: _____ is important.", "back": "[concept]" }
          ],
          "created_at": "timestamp"
      }
@@ -220,16 +197,15 @@
    - **Success Codes:** 201 Created
    - **Error Codes:** 400 Bad Request, 401 Unauthorized, 429 Too Many Requests (if daily limit exceeded), 503 Service Unavailable (if AI API fails)
    - **Business Logic:**
-     1. Authenticate user via JWT token and verify ownership of the deck
-     2. Validate input text length (must be between 1000-10000 characters)
-     5. Call AI service (GPT-4o-mini) to generate flashcards based on input text
-     6. AI should generate both question-answer and gaps type flashcards
-     7. Expected output: 10-15 flashcards for ~1000 characters, 30-50 flashcards for ~10000 characters (as per US-002)
-     8. If AI API fails (503 error), system should inform user to use manual flashcard creation as fallback (US-007)
-     9. Create flashcards in database with `source` set to `ai-full` and link to specified deck
-     10. Record generation metadata in `generations` table (user_id, model used, flashcards_count, generation_duration)
-     11. Return generated flashcards list with generation metadata
-     12. User can then accept individual flashcards or the entire list (US-002)
+     1. Validate input text length (must be between 1000-10000 characters)
+     2. Call AI service (GPT-4o-mini) to generate flashcards based on input text
+     3. AI should generate both question-answer and gaps type flashcards
+     4. Expected output: 10-15 flashcards for ~1000 characters, 30-50 flashcards for ~10000 characters (as per US-002)
+     5. If AI API fails (503 error), system should inform user to use manual flashcard creation as fallback (US-007)
+     6. Record generation metadata in `generations` table (user_id, model used, flashcards_count, generation_duration)
+     7. Return flashcard proposals (without id, deck_id, created_at, updated_at fields) with generation metadata
+     8. Flashcards are NOT saved to database at this stage
+     9. User can then accept individual flashcards or the entire list (US-002) via the bulk create flashcards endpoint
 
 ## 3. Authentication and Authorization
 
