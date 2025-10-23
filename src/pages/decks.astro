@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import DeckListView from "../components/DeckListView";
+
+export const prerender = false;
+---
+
+<Layout title="My Decks">
+  <DeckListView client:load />
+</Layout>

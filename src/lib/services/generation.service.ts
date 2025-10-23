@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "../../db/supabase.client";
 import type { GenerateFlashcardsResponseDTO, FlashcardProposalDTO, Model } from "../../types";
 import { generateFlashcardsWithAI } from "./ai.service";
-import { calculateTextHash, calculateTextLength } from "../utils";
+import { calculateTextHash, calculateTextLength } from "../utils.server";
 
 interface GenerateFlashcardsParams {
   text: string;

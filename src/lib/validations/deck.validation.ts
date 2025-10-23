@@ -35,13 +35,7 @@ export const listDecksQuerySchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 10))
-    .pipe(
-      z
-        .number()
-        .int()
-        .positive("Limit must be a positive integer")
-        .max(100, "Limit cannot exceed 100")
-    ),
+    .pipe(z.number().int().positive("Limit must be a positive integer").max(100, "Limit cannot exceed 100")),
   sort: z.enum(["created_at", "updated_at", "title"]).optional().default("created_at"),
   filter: z.string().optional(),
 });

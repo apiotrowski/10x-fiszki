@@ -121,7 +121,7 @@ export interface FlashcardProposalDTO {
   front: string;
   back: string;
   source: Source;
-  generation_id: number | null;
+  generation_id: string | null;
   deck_id: string;
 }
 
