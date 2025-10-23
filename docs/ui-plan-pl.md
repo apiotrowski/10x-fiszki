@@ -14,13 +14,76 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
 - **Kluczowe komponenty widoku:** Formularze wejściowe, komunikaty walidacyjne, wskaźniki ładowania, pola do bezpiecznego wprowadzania hasła.
 - **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** Nawigacja przy użyciu klawiatury, etykiety ARIA dla elementów formularza, bezpieczne przetwarzanie danych osobowych, natychmiastowa informacja zwrotna o błędach oraz ochrona przed atakami brute force.
 
-### 2.2. Dashboard
+### 2.2. Lista talii ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Dashboard (Lista Talii)
 - **Ścieżka widoku:** `/decks`
 - **Główny cel:** Zaprezentowanie przeglądu wszystkich talii użytkownika z możliwością wyszukiwania, filtrowania, paginacji oraz tworzenia nowych talii.
 - **Kluczowe informacje do wyświetlenia:** Lista talii (tytuł, ilość fiszek, data utworzenia), kontrolki paginacji, pasek wyszukiwania, przycisk dodawania talii.
 - **Kluczowe komponenty widoku:** Komponenty listy lub kart, pola wyszukiwania, dropdowny do filtrowania, komponent paginacji oraz przyciski akcji.
 - **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** Jasne zarządzanie fokusami, wysoki kontrast tekstu i tła, responsywność dla urządzeń mobilnych i desktop, bezpieczne wywołania API zapewniające dostęp jedynie do danych użytkownika.
+
+**Szczegóły implementacji:**
+- **Główny komponent:** `DeckListView.tsx` - React component z pełną interaktywnością
+- **Strona Astro:** `decks.astro` - wykorzystuje `client:load` dla hydratacji komponentu React
+- **Zaimplementowane funkcje:**
+  - ✅ Wyszukiwanie talii w czasie rzeczywistym (SearchBar)
+  - ✅ Sortowanie po: dacie utworzenia, dacie aktualizacji, tytule (FilterSortControls)
+  - ✅ Kolejność sortowania: rosnąco/malejąco
+  - ✅ Paginacja z pełną kontrolą nawigacji (Pagination)
+  - ✅ Wyświetlanie listy talii z metadanymi (DeckList)
+  - ✅ Tworzenie nowej talii (NewDeckButton)
+  - ✅ Usuwanie talii z potwierdzeniem (DeleteDeckDialog)
+  - ✅ Obsługa stanów: ładowanie, błędy, pusta lista
+  - ✅ Responsywny design (mobile-first)
+- **Custom Hooks:**
+  - `useFetchDecks` - pobieranie i zarządzanie listą talii
+  - `useDeleteDeck` - obsługa usuwania talii
+- **Komponenty pomocnicze:**
+  - `SearchBar.tsx` - pasek wyszukiwania z debouncing
+  - `FilterSortControls.tsx` - kontrolki sortowania
+  - `DeckList.tsx` - lista/tabela z taliami
+  - `Pagination.tsx` - komponent paginacji
+  - `NewDeckButton.tsx` - przycisk tworzenia talii
+  - `DeleteDeckDialog.tsx` - modal potwierdzenia usunięcia
+- **Integracja z API:**
+  - GET `/api/decks` - pobieranie listy talii z parametrami: page, limit, sort, filter, order
+  - DELETE `/api/decks/{deckId}` - usuwanie talii
+- **Accessibility:**
+  - Role ARIA dla alertów i dialogów
+  - Obsługa nawigacji klawiaturą
+  - Komunikaty o błędach w formacie dostępnym dla czytników ekranu
+  - Wysokie kontrasty kolorów
+
+### 2.2.1. Tworzenie nowej talii
+- **Nazwa widoku:** Tworzenie Nowej Talii
+- **Ścieżka widoku:** `/decks/new`
+- **Główny cel:** Umożliwienie użytkownikowi utworzenia nowej talii poprzez podanie nazwy i opcjonalnego opisu, z walidacją danych oraz respektowaniem dziennego limitu tworzenia talii.
+- **Kluczowe informacje do wyświetlenia:** 
+  - Formularz z polem na nazwę talii (wymagane, max 100 znaków).
+  - Pole na opis talii (opcjonalne, max 500 znaków).
+  - Licznik pozostałych znaków dla obu pól.
+  - Komunikaty walidacyjne w przypadku błędnych danych.
+  - Informacja o dziennym limicie (5 talii dziennie).
+  - Przyciski akcji: "Utwórz talię" oraz "Anuluj".
+- **Kluczowe komponenty widoku:** 
+  - Formularz z polami input (nazwa) i textarea (opis).
+  - Komunikaty walidacyjne inline pod każdym polem.
+  - Liczniki znaków dla pól tekstowych.
+  - Przyciski akcji z odpowiednimi stanami (disabled podczas ładowania).
+  - Wskaźnik ładowania podczas tworzenia talii.
+  - Toast notifications dla komunikatów o sukcesie lub błędzie.
+  - Alert informujący o osiągnięciu dziennego limitu (jeśli dotyczy).
+- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** 
+  - Walidacja w czasie rzeczywistym z natychmiastową informacją zwrotną.
+  - Wyraźne komunikaty o błędach walidacji (puste pole, przekroczenie limitu znaków).
+  - Etykiety ARIA dla wszystkich pól formularza.
+  - Obsługa nawigacji klawiaturą (Tab, Enter do wysłania formularza).
+  - Potwierdzenie przed opuszczeniem strony jeśli formularz zawiera niezapisane dane.
+  - Po pomyślnym utworzeniu talii automatyczne przekierowanie do `/decks/{deckId}`.
+  - Obsługa błędu przekroczenia dziennego limitu (5 talii) z jasnym komunikatem.
+  - Bezpieczne wywołanie API POST `/api/decks` z walidacją po stronie serwera.
+  - Wysoki kontrast dla komunikatów błędów.
+  - Responsywny design dostosowany do urządzeń mobilnych i desktop.
 
 ### 2.3. Widok szczegółów talii
 - **Nazwa widoku:** Szczegóły Talii
