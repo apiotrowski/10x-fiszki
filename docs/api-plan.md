@@ -368,12 +368,48 @@
      - check available type of flashards (available types: `question-answer`, `gaps`)
      - check source (available types: `manual`, `ai-edited`)
 
-4. **Delete Flashcard**
+4. **Delete Flashcard** ✅ IMPLEMENTED
    - **Method:** DELETE
    - **URL:** `/api/decks/{deckId}/flashcards/{flashcardId}`
-   - **Description:** Remove a flashcard from a deck.
+   - **Description:** Delete a specific flashcard from a deck. User must own the deck.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId]/flashcards/[flashcardId].ts`
+   - **Service Layer:** Uses `deleteFlashcard` service from `/src/lib/services/flashcard.service.ts`
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck containing the flashcard
+     - `flashcardId` (required) - UUID of the flashcard to delete
+   - **Response:** No response body (204 No Content on success)
    - **Success Codes:** 204 No Content
-   - **Error Codes:** 404 Not Found, 401 Unauthorized
+   - **Error Codes:**
+     - 400 Bad Request (invalid UUID format for deckId or flashcardId)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck not found, flashcard not found, or flashcard doesn't belong to deck)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema)
+     - `deckId` must be a valid UUID v4 format
+     - `flashcardId` must be a valid UUID v4 format
+   - **Key Implementation Details:**
+     - Validates both UUID formats before querying database
+     - Verifies deck ownership using `verifyDeckOwnership` helper
+     - Confirms flashcard exists and belongs to specified deck
+     - Two-step verification: deck ownership first, then flashcard-deck relationship
+     - Returns 204 No Content (no response body) on successful deletion
+     - Returns 404 (not 403) for unauthorized access to prevent information disclosure
+     - Idempotent operation considerations in error handling
+   - **Security Features:**
+     - Dual authorization check: deck ownership + flashcard-deck relationship
+     - UUID validation prevents injection attacks
+     - No information disclosure (same 404 for various error scenarios)
+     - Parameterized queries via Supabase client
+     - Users can only delete flashcards from their own decks
+   - **Performance Optimizations:**
+     - Deck ownership verified with single query via helper function
+     - Flashcard existence and relationship verified in one query
+     - Delete operation is single database query
+     - Database indexes on deck_id in flashcards table
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/delete-deck-implementation-plan.md`
+     - Test Cases: `/docs/testing/delete-flashcard-test-cases.md`
+     - Examples: `/docs/examples/delete-flashcard-example.md`
 
 ### D. AI-Driven Flashcard Generation
 

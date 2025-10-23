@@ -1,5 +1,5 @@
 import type { FlashcardDTO } from "../../types";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
@@ -65,16 +65,14 @@ export function FlashcardsList({ flashcards, onFlashcardEdit, onFlashcardDelete 
   };
 
   return (
-    <div className="space-y-4" role="list" aria-label="Lista fiszek">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Lista fiszek">
       {flashcards.map((flashcard) => (
-        <Card key={flashcard.id} role="listitem">
+        <Card key={flashcard.id} role="listitem" className="flex flex-col h-full">
           <CardHeader>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg mb-2">
+                <CardTitle className="text-base mb-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-muted-foreground text-sm">Typ:</span>
-                    <span className="text-sm">{getTypeLabel(flashcard.type)}</span>
                     <span
                       className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getSourceBadgeColor(
                         flashcard.source
@@ -84,12 +82,7 @@ export function FlashcardsList({ flashcards, onFlashcardEdit, onFlashcardDelete 
                     </span>
                   </div>
                 </CardTitle>
-                <CardDescription className="text-xs">
-                  Utworzono: {formatDate(flashcard.created_at)}
-                  {flashcard.updated_at !== flashcard.created_at && (
-                    <> • Aktualizowano: {formatDate(flashcard.updated_at)}</>
-                  )}
-                </CardDescription>
+                <CardDescription className="text-xs">{getTypeLabel(flashcard.type)}</CardDescription>
               </div>
               {(onFlashcardEdit || onFlashcardDelete) && (
                 <CardAction>
@@ -172,21 +165,24 @@ export function FlashcardsList({ flashcards, onFlashcardEdit, onFlashcardDelete 
               )}
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="flex-1">
+            <div className="space-y-3">
               {/* Front side */}
               <div>
-                <div className="text-sm font-semibold text-muted-foreground mb-1">Przód:</div>
-                <div className="text-base bg-muted/50 p-3 rounded-md">{flashcard.front}</div>
+                <div className="text-xs font-semibold text-muted-foreground mb-1">Przód:</div>
+                <div className="text-sm bg-muted/50 p-2.5 rounded-md line-clamp-3">{flashcard.front}</div>
               </div>
 
               {/* Back side */}
               <div>
-                <div className="text-sm font-semibold text-muted-foreground mb-1">Tył:</div>
-                <div className="text-base bg-muted/50 p-3 rounded-md">{flashcard.back}</div>
+                <div className="text-xs font-semibold text-muted-foreground mb-1">Tył:</div>
+                <div className="text-sm bg-muted/50 p-2.5 rounded-md line-clamp-3">{flashcard.back}</div>
               </div>
             </div>
           </CardContent>
+          <CardFooter className="text-xs text-muted-foreground pt-0">
+            <div className="truncate">Utworzono: {formatDate(flashcard.created_at)}</div>
+          </CardFooter>
         </Card>
       ))}
     </div>
