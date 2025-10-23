@@ -1,0 +1,17 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import GenerateFlashcardsView from "../../../components/GenerateFlashcardsView";
+
+export const prerender = false;
+
+const { deckId } = Astro.params;
+
+// Validate deckId exists
+if (!deckId) {
+  return Astro.redirect("/decks");
+}
+---
+
+<Layout title="Generowanie fiszek przez AI">
+  <GenerateFlashcardsView client:load deckId={deckId} />
+</Layout>

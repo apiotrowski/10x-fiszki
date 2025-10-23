@@ -123,6 +123,7 @@ export interface FlashcardProposalDTO {
   source: Source;
   generation_id: string | null;
   deck_id: string;
+  is_accepted: boolean;
 }
 
 // Komenda utworzenia flashcard (żądanie ręczne)

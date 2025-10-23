@@ -60,7 +60,7 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
 
   const handleAddFlashcard = () => {
     // TODO: Navigate to add flashcard page
-    window.location.href = `/decks/${deckId}/flashcards/new`;
+    window.location.href = `/decks/${deckId}/generate`;
   };
 
   const handleDeleteDeck = () => {
