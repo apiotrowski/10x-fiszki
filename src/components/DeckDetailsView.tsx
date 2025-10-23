@@ -5,6 +5,7 @@ import { ActionPanel } from "./deck-details/ActionPanel";
 import { ConfirmationModal } from "./deck-details/ConfirmationModal";
 import { useDeckDetails } from "./hooks/useDeckDetails";
 import { useDeleteDeck } from "./hooks/useDeleteDeck";
+import { useDeleteFlashcard } from "./hooks/useDeleteFlashcard";
 import { Button } from "./ui/button";
 
 interface DeckDetailsViewProps {
@@ -24,17 +25,28 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   const [flashcardToDelete, setFlashcardToDelete] = useState<string | null>(null);
 
   // Fetch deck and flashcards data
-  const { deck, flashcards, flashcardsPagination, isLoadingDeck, isLoadingFlashcards, deckError, flashcardsError } =
-    useDeckDetails({
-      deckId,
-      flashcardsPage,
-      flashcardsLimit,
-      flashcardsSort,
-      flashcardsFilter,
-    });
+  const {
+    deck,
+    flashcards,
+    flashcardsPagination,
+    isLoadingDeck,
+    isLoadingFlashcards,
+    deckError,
+    flashcardsError,
+    refetchFlashcards,
+  } = useDeckDetails({
+    deckId,
+    flashcardsPage,
+    flashcardsLimit,
+    flashcardsSort,
+    flashcardsFilter,
+  });
 
   // Delete deck hook
   const { isDeleting, error: deleteError, deleteDeck } = useDeleteDeck();
+
+  // Delete flashcard hook
+  const { isDeleting: isDeletingFlashcard, error: deleteFlashcardError, deleteFlashcard } = useDeleteFlashcard();
 
   // Event handlers
   const handleBackToList = () => {
@@ -81,10 +93,16 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   const handleConfirmDeleteFlashcard = async () => {
     if (!flashcardToDelete) return;
 
-    // TODO: Implement flashcard deletion
-    // For now, just close the modal
-    setIsDeleteFlashcardModalOpen(false);
-    setFlashcardToDelete(null);
+    const success = await deleteFlashcard(deckId, flashcardToDelete);
+
+    if (success) {
+      // Close modal and clear state
+      setIsDeleteFlashcardModalOpen(false);
+      setFlashcardToDelete(null);
+
+      // Refetch flashcards to update the list
+      await refetchFlashcards();
+    }
   };
 
   const handleCancelDeleteFlashcard = () => {
@@ -127,6 +145,17 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
         >
           <p className="font-semibold">Wystąpił błąd podczas usuwania talii</p>
           <p className="text-sm">{deleteError}</p>
+        </div>
+      )}
+
+      {/* Delete flashcard error state */}
+      {deleteFlashcardError && (
+        <div
+          className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md mb-6"
+          role="alert"
+        >
+          <p className="font-semibold">Wystąpił błąd podczas usuwania fiszki</p>
+          <p className="text-sm">{deleteFlashcardError}</p>
         </div>
       )}
 
@@ -212,6 +241,7 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
             cancelLabel="Anuluj"
             onConfirm={handleConfirmDeleteFlashcard}
             onCancel={handleCancelDeleteFlashcard}
+            isLoading={isDeletingFlashcard}
             variant="destructive"
           />
         </>

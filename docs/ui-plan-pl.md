@@ -85,13 +85,51 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Wysoki kontrast dla komunikatów błędów.
   - Responsywny design dostosowany do urządzeń mobilnych i desktop.
 
-### 2.3. Widok szczegółów talii
+### 2.3. Widok szczegółów talii ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Szczegóły Talii
 - **Ścieżka widoku:** `/decks/{deckId}`
 - **Główny cel:** Prezentacja szczegółowych informacji o wybranej talii wraz z przeglądem fiszek i opcjami edycji lub usuwania.
 - **Kluczowe informacje do wyświetlenia:** Tytuł talii, metadane, lista fiszek oraz opcje edycji, usunięcia czy dodania nowych fiszek.
 - **Kluczowe komponenty widoku:** Nagłówek z informacjami o talii, lista fiszek (komponenty kart), przyciski akcji (edycja, usuwanie, dodanie fiszek) oraz modalne okna potwierdzeń.
 - **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** Potwierdzenie działań destrukcyjnych przez modale, dostępne modalne okna dialogowe, walidacja dostępu do danych użytkownika oraz wyraźna informacja zwrotna o błędach i sukcesach.
+
+**Szczegóły implementacji:**
+- **Główny komponent:** `DeckDetailsView.tsx` - React component z pełną interaktywnością
+- **Strona Astro:** `decks/[deckId].astro` - dynamiczna ścieżka z wykorzystaniem `client:load` dla hydratacji komponentu React
+- **Zaimplementowane funkcje:**
+  - ✅ Wyświetlanie szczegółów talii (tytuł, daty utworzenia i aktualizacji, metadane)
+  - ✅ Przegląd listy fiszek z podglądem front/back
+  - ✅ Edycja talii (przycisk z przekierowaniem do `/decks/{deckId}/edit`)
+  - ✅ Usuwanie talii z modalem potwierdzenia
+  - ✅ Dodawanie fiszek (przycisk z przekierowaniem do `/decks/{deckId}/flashcards/new`)
+  - ✅ Edycja pojedynczej fiszki (dropdown menu na karcie fiszki)
+  - ✅ Usuwanie pojedynczej fiszki z modalem potwierdzenia
+  - ✅ Obsługa stanów: ładowanie talii, ładowanie fiszek, błędy, pusta lista fiszek
+  - ✅ Przycisk powrotu do listy talii
+  - ✅ Responsywny design z grid layout dla fiszek (1-3 kolumny w zależności od szerokości ekranu)
+  - ✅ Wyświetlanie źródła fiszki (ręcznie/AI) z kolorowym badge
+  - ✅ Wyświetlanie typu fiszki (pytanie-odpowiedź, luki)
+- **Custom Hooks:**
+  - `useDeckDetails` - pobieranie szczegółów talii i listy fiszek z paginacją
+  - `useDeleteDeck` - obsługa usuwania talii
+  - `useDeleteFlashcard` - obsługa usuwania fiszki
+- **Komponenty pomocnicze:**
+  - `DeckHeader.tsx` - nagłówek z tytułem, datami i metadanymi talii
+  - `FlashcardsList.tsx` - grid z kartami fiszek, dropdown menu akcji
+  - `ActionPanel.tsx` - panel z przyciskami akcji (edycja, dodanie, usunięcie talii)
+  - `ConfirmationModal.tsx` - uniwersalny modal potwierdzenia operacji destrukcyjnych
+- **Integracja z API:**
+  - GET `/api/decks/{deckId}` - pobieranie szczegółów talii
+  - GET `/api/decks/{deckId}/flashcards` - pobieranie listy fiszek z parametrami: page, limit, sort, filter
+  - DELETE `/api/decks/{deckId}` - usuwanie talii
+  - DELETE `/api/decks/{deckId}/flashcards/{flashcardId}` - usuwanie fiszki
+- **Accessibility:**
+  - Role ARIA dla list, toolbara i modali
+  - Etykiety aria-label dla przycisków akcji
+  - Komunikaty o błędach w formacie role="alert"
+  - Obsługa nawigacji klawiaturą w dropdown menu i modalach
+  - Wysokie kontrasty kolorów dla różnych stanów
+  - Wskaźniki ładowania z opisowym tekstem
 
 ### 2.4. Widoki tworzenia fiszek
 - **Nazwa widoku:** Ręczne Tworzenie Fiszek

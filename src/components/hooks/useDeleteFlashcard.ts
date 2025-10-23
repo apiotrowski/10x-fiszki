@@ -1,23 +1,23 @@
 import { useState, useCallback } from "react";
 
-interface UseDeleteDeckResult {
+interface UseDeleteFlashcardResult {
   isDeleting: boolean;
   error: string | null;
-  deleteDeck: (deckId: string) => Promise<boolean>;
+  deleteFlashcard: (deckId: string, flashcardId: string) => Promise<boolean>;
 }
 
-export function useDeleteDeck(): UseDeleteDeckResult {
+export function useDeleteFlashcard(): UseDeleteFlashcardResult {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const deleteDeck = useCallback(async (deckId: string): Promise<boolean> => {
+  const deleteFlashcard = useCallback(async (deckId: string, flashcardId: string): Promise<boolean> => {
     // Start deleting
     setIsDeleting(true);
     setError(null);
 
     try {
       // Make DELETE API call
-      const response = await fetch(`/api/decks/${deckId}`, {
+      const response = await fetch(`/api/decks/${deckId}/flashcards/${flashcardId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -27,11 +27,11 @@ export function useDeleteDeck(): UseDeleteDeckResult {
       // Handle non-OK responses
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error("Deck not found or you do not have permission to delete it");
+          throw new Error("Fiszka nie została znaleziona lub nie należy do tej talii");
         }
 
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to delete deck (${response.status})`);
+        throw new Error(errorData.error || `Nie udało się usunąć fiszki (${response.status})`);
       }
 
       // Success - 204 No Content has no body
@@ -39,12 +39,12 @@ export function useDeleteDeck(): UseDeleteDeckResult {
       return true;
     } catch (err) {
       // Handle errors
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieznany błąd";
       setError(errorMessage);
 
       // Log error for debugging
       // eslint-disable-next-line no-console
-      console.error("Error deleting deck:", err);
+      console.error("Wystąpił błąd podczas usuwania fiszki:", err);
 
       return false;
     } finally {
@@ -56,6 +56,6 @@ export function useDeleteDeck(): UseDeleteDeckResult {
   return {
     isDeleting,
     error,
-    deleteDeck,
+    deleteFlashcard,
   };
 }
