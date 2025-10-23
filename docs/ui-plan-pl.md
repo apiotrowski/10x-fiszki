@@ -131,6 +131,76 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Wysokie kontrasty kolorów dla różnych stanów
   - Wskaźniki ładowania z opisowym tekstem
 
+### 2.3.1. Widok generowania fiszek przez AI
+- **Nazwa widoku:** Generowanie Fiszek przez AI
+- **Ścieżka widoku:** `/decks/{deckId}/flashcards/generate`
+- **Główny cel:** Umożliwienie użytkownikom wygenerowania fiszek przy użyciu AI na podstawie wprowadzonego tekstu źródłowego z możliwością przeglądu i akceptacji propozycji.
+- **Kluczowe informacje do wyświetlenia:** 
+  - Formularz z polem tekstowym na tekst źródłowy (1000-10000 słów).
+  - Parametry generowania: liczba fiszek do wygenerowania.
+  - Podgląd wygenerowanych propozycji fiszek z możliwością akceptacji/odrzucenia pojedynczych fiszek.
+  - Licznik znaków w czasie rzeczywistym.
+- **Kluczowe komponenty widoku:** 
+  - Formularz wprowadzania tekstu z textarea i walidacją długości (1000-10000 znaków).
+  - Selektor liczby fiszek do wygenerowania (zakres: 10-50).
+  - Przycisk "Generuj fiszki" z wskaźnikiem ładowania podczas wywołania API.
+  - Lista wygenerowanych propozycji fiszek z podglądem front/back.
+  - Przycisk do akceptacji/odrzucenia pojedynczych fiszek.
+  - Przyciski "Zaakceptuj wszystkie" i "Odrzuć wszystkie".
+  - Przycisk "Zapisz zaakceptowane fiszki" aktywny tylko gdy co najmniej jedna fiszka jest zaakceptowana. "Zapisz wszystkie", niezaleznie czy któraś z fiszek jest zaakceptowana. Po przyciśnięciu powinien pojawić się AlertDialog, czy jesteś pewien, ze chesz zapisać wszystkie fiszki pomimo braku akceptacji?
+  - Komunikaty walidacyjne.
+  - Modal potwierdzenia przed zapisaniem fiszek.
+- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** 
+  - Walidacja długości tekstu w czasie rzeczywistym z wizualnym wskaźnikiem (licznik słów).
+  - Wyraźna informacja o limitach (1000-10000 słów, 10 generacji dziennie).
+  - Wskaźnik postępu podczas generowania fiszek przez AI.
+  - Obsługa błędów API z jasnymi komunikatami (np. przekroczenie limitu, błąd AI, brak dostępu do API).
+  - Możliwość powrotu do edycji tekstu źródłowego po wygenerowaniu propozycji.
+  - Etykiety ARIA dla wszystkich interaktywnych elementów.
+  - Nawigacja klawiaturą przez listę propozycji.
+  - Wysokie kontrasty dla stanów zaakceptowanych/odrzuconych fiszek.
+  - Bezpieczne wywołanie API POST `/api/decks/{deckId}/flashcards/generate` z walidacją po stronie serwera.
+  - Responsywny design dostosowany do urządzeń mobilnych i desktop.
+  - Automatyczne zapisywanie stanu formularza w localStorage (opcjonalnie).
+
+**Szczegóły implementacji:**
+- **Główny komponent:** `GenerateFlashcardsView.tsx` - React component z pełną interaktywnością
+- **Strona Astro:** `decks/[deckId]/flashcards/generate.astro` - dynamiczna ścieżka z wykorzystaniem `client:load` dla hydratacji komponentu React
+- **Funkcje do zaimplementowania:**
+  - Formularz wprowadzania tekstu z walidacją długości (1000-10000 słów)
+  - Licznik słów w czasie rzeczywistym
+  - Selektor liczby fiszek (10-50) i poziomu trudności
+  - Wywołanie API generowania fiszek z obsługą stanów ładowania
+  - Wyświetlanie listy wygenerowanych propozycji z podglądem
+  - Mechanizm akceptacji/odrzucenia pojedynczych fiszek
+  - Przyciski "Zaakceptuj wszystkie" / "Odrzuć wszystkie"
+  - Zapisywanie zaakceptowanych fiszek do talii
+  - Obsługa błędów: przekroczenie limitu dziennego, błąd AI, błąd walidacji
+  - Modal potwierdzenia przed zapisaniem
+  - Przycisk powrotu do szczegółów talii
+- **Custom Hooks:**
+  - `useGenerateFlashcards` - obsługa wywołania API generowania fiszek
+  - `useFlashcardSelection` - zarządzanie stanem akceptacji/odrzucenia propozycji
+  - `useWordCount` - licznik słów w czasie rzeczywistym
+- **Komponenty pomocnicze:**
+  - `TextInputForm.tsx` - formularz z textarea, licznikiem słów i parametrami
+  - `GeneratedFlashcardsList.tsx` - lista propozycji z checkboxami/przyciskami akcji
+  - `FlashcardPreviewCard.tsx` - karta podglądu pojedynczej propozycji fiszki
+  - `GenerationProgress.tsx` - wskaźnik postępu podczas generowania
+  - `SaveConfirmationModal.tsx` - modal potwierdzenia zapisu fiszek
+- **Integracja z API:**
+  - POST `/api/decks/{deckId}/flashcards/generate` - generowanie fiszek przez AI
+    - Body: `{ text: string, count: number }`
+    - Response: `{ flashcards: Array<{ front: string, back: string, type: string, source: ai-full }> }`
+  - POST `/api/decks/{deckId}/flashcards` - zapisywanie wielu fiszek jednocześnie
+- **Accessibility:**
+  - Role ARIA dla formularza, listy propozycji i modali
+  - Etykiety aria-label dla przycisków akcji i checkboxów
+  - Komunikaty o błędach w formacie role="alert"
+  - Obsługa nawigacji klawiaturą w formularzu i liście propozycji
+  - Wskaźniki ładowania z opisowym tekstem
+
+
 ### 2.4. Widoki tworzenia fiszek
 - **Nazwa widoku:** Ręczne Tworzenie Fiszek
 - **Ścieżka widoku:** `/decks/{deckId}/flashcards/new`
