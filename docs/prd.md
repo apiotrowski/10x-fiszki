@@ -77,14 +77,38 @@ Kryteria akceptacji:
 - Użytkownik może zapisać nowo utworzoną fiszkę oraz później ją edytować lub usunąć.
 - Podczas tworzenia fiszki ręcznie powinna być weryfikacja dlugosci `front` (maksymalnie 200 znaków), `back` (maksymalnie 500 znaków), `source` powinien być ustawiony jako `manual`
 
+### US-003.1
+ID: US-003.1  
+Tytuł: Przeglądanie listy talii użytkownika  
+Opis: Jako użytkownik chcę móc przeglądać listę wszystkich moich talii z możliwością filtrowania i sortowania, aby łatwo odnaleźć interesujący mnie materiał edukacyjny.  
+Kryteria akceptacji:
+- Talie są wyświetlane w postaci listy z kluczowymi informacjami (tytuł, liczba fiszek, data utworzenia).
+- Użytkownik ma możliwość filtrowania talii według różnych kryteriów.
+- Użytkownik może zmieniać kierunek sortowania (rosnąco/malejąco), jak i kolumnę po której następuje sortowanie.
+- Kliknięcie w daną talię przekierowuje do widoku szczegółów talii (US-004).
+- Na widoku znajduje się przycisk umożliwiający utworzenie nowej talii.
+- Interfejs jest responsywny i dostępny zgodnie z wytycznymi WCAG.
+
+### US-003.2
+ID: US-003.2  
+Tytuł: Tworzenie nowej talii  
+Opis: Jako użytkownik chcę móc utworzyć nową talię, aby organizować fiszki według tematów lub kategorii.  
+Kryteria akceptacji:
+- Użytkownik może utworzyć nową talię, podając nazwę talii oraz opis.
+- Nazwa talii jest wymagana i powinna być walidowana (maksymalnie 100 znaków, nie może być pusta).
+- Opis talii jest opcjonalny i powinien być walidowany (maksymalnie 500 znaków).
+- System wyświetla komunikaty walidacyjne w przypadku błędnych danych.
+- Po pomyślnym utworzeniu talii użytkownik jest przekierowywany do widoku szczegółów nowo utworzonej talii.
+- System respektuje limit 5 nowych talii dziennie (zgodnie z US-006).
+
+
 ### US-004
 ID: US-004  
-Tytuł: Przeglądanie i zarządzanie fiszkami w ramach talii  
-Opis: Jako użytkownik chcę móc przeglądać fiszki pogrupowane w talie, aby łatwo odnaleźć i zarządzać materiałem edukacyjnym.  
+Tytuł: Podgląd widoku talli wraz z opcją zarządzania fiszkami w talii  
+Opis: Jako użytkownik chcę móc obejrzeć szczegóły talii, której zobaczę dane talii, jak równie fiszki pogrupowane w talie, aby łatwo odnaleźć i zarządzać materiałem edukacyjnym.  
 Kryteria akceptacji:
 - Fiszki są wyświetlane w kontekście talie, do której należą.
 - Użytkownik może edytować, usuwać lub przenosić fiszki między taliami.
-- System wprowadza limit 5 nowych talii dziennie.
 
 ### US-005
 ID: US-005  
