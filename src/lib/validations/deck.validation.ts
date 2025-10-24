@@ -5,7 +5,7 @@ import { z } from "zod";
  * Ensures the deckId is a valid UUID v4 format
  */
 export const deckIdParamSchema = z.string().uuid({
-  message: "Invalid deck ID format. Must be a valid UUID.",
+  message: "Nieprawidłowy format ID talii. Musi być prawidłowym UUID.",
 });
 
 /**
@@ -15,8 +15,8 @@ export const deckIdParamSchema = z.string().uuid({
 export const createDeckSchema = z.object({
   title: z
     .string()
-    .min(1, "Title is required and cannot be empty")
-    .max(100, "Title must not exceed 100 characters")
+    .min(1, "Nazwa jest wymagana i nie może być pusta")
+    .max(100, "Nazwa nie może przekraczać 100 znaków")
     .trim(),
   metadata: z.record(z.unknown()).optional().default({}),
 });
@@ -30,12 +30,14 @@ export const listDecksQuerySchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 1))
-    .pipe(z.number().int().positive("Page must be a positive integer")),
+    .pipe(z.number().int().positive("Strona musi być dodatnią liczbą całkowitą")),
   limit: z
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 10))
-    .pipe(z.number().int().positive("Limit must be a positive integer").max(100, "Limit cannot exceed 100")),
+    .pipe(
+      z.number().int().positive("Limit musi być dodatnią liczbą calkowita").max(100, "Limit nie moze przekracać 100")
+    ),
   sort: z.enum(["created_at", "updated_at", "title"]).optional().default("created_at"),
   filter: z.string().optional(),
 });

@@ -72,7 +72,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     return new Response(
       JSON.stringify({
-        error: "Failed to list decks",
+        error: "Nie udało się pobrać listy talii",
         message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
@@ -104,7 +104,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch {
     return new Response(
       JSON.stringify({
-        error: "Invalid JSON in request body",
+        error: "Nieprawidłowy JSON w ciele żądania",
       }),
       {
         status: 400,
@@ -124,7 +124,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     return new Response(
       JSON.stringify({
-        error: "Validation failed",
+        error: "Walidacja nie powiodła się",
         details: errors,
       }),
       {
@@ -151,12 +151,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error) {
     // Generic error handling for unexpected exceptions
     // eslint-disable-next-line no-console
-    console.error("Error creating deck:", error);
+    console.error("Błąd podczas tworzenia talii:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Failed to create deck",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: "Nie udało się utworzyć talii",
+        message: error instanceof Error ? error.message : "Nieznany błąd",
       }),
       {
         status: 500,

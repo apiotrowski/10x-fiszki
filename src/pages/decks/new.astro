@@ -1,0 +1,10 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CreateDeckView from "../../components/CreateDeckView";
+
+export const prerender = false;
+---
+
+<Layout title="Utwórz nową talię">
+  <CreateDeckView client:load />
+</Layout>
