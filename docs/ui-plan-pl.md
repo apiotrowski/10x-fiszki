@@ -54,7 +54,7 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Komunikaty o błędach w formacie dostępnym dla czytników ekranu
   - Wysokie kontrasty kolorów
 
-### 2.2.1. Tworzenie nowej talii
+### 2.2.1. Tworzenie nowej talii ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Tworzenie Nowej Talii
 - **Ścieżka widoku:** `/decks/new`
 - **Główny cel:** Umożliwienie użytkownikowi utworzenia nowej talii poprzez podanie nazwy i opcjonalnego opisu, z walidacją danych oraz respektowaniem dziennego limitu tworzenia talii.
@@ -131,7 +131,7 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Wysokie kontrasty kolorów dla różnych stanów
   - Wskaźniki ładowania z opisowym tekstem
 
-### 2.3.1. Widok generowania fiszek przez AI
+### 2.3.1. Widok generowania fiszek przez AI ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Generowanie Fiszek przez AI
 - **Ścieżka widoku:** `/decks/{deckId}/flashcards/generate`
 - **Główny cel:** Umożliwienie użytkownikom wygenerowania fiszek przy użyciu AI na podstawie wprowadzonego tekstu źródłowego z możliwością przeglądu i akceptacji propozycji.

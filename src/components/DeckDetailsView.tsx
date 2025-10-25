@@ -59,8 +59,13 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
   };
 
   const handleAddFlashcard = () => {
-    // TODO: Navigate to add flashcard page
+    // Navigate to generate flashcards page
     window.location.href = `/decks/${deckId}/generate`;
+  };
+
+  const handleAddManualFlashcard = () => {
+    // Navigate to manual flashcard creation page
+    window.location.href = `/decks/${deckId}/flashcards/new`;
   };
 
   const handleDeleteDeck = () => {
@@ -169,6 +174,7 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
             onEdit={handleEditDeck}
             onDelete={handleDeleteDeck}
             onAddFlashcard={handleAddFlashcard}
+            onAddManualFlashcard={handleAddManualFlashcard}
             isLoading={isDeleting}
           />
 
