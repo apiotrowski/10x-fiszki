@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import type { CreateDeckCommand } from "../../../types";
 import { createDeckSchema, listDecksQuerySchema } from "../../../lib/validations/deck.validation";
 import { createDeck, listDecks } from "../../../lib/services/deck.service";
 import { DEFAULT_USER_ID } from "../../../db/supabase.client";
@@ -140,7 +141,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const deck = await createDeck(supabase, userId, {
       title,
-      metadata: metadata || {},
+      metadata: (metadata || {}) as CreateDeckCommand["metadata"],
     });
 
     // Step 4: Return successful response with created deck (201 Created)

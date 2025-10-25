@@ -92,6 +92,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     source: flashcard.source,
     generation_id: null,
     deck_id: deckId,
+    is_accepted: false,
   }));
 
   // Step 5: Call flashcard service to create flashcards

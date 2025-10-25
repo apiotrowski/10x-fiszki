@@ -22,10 +22,21 @@ export function DeckHeader({ deck }: DeckHeaderProps) {
         <CardTitle className="text-3xl">{deck.title}</CardTitle>
         <CardDescription className="mt-2 space-y-1">
           <div className="flex flex-wrap gap-4 text-sm">
-            <span>
+            {deck.metadata &&
+              typeof deck.metadata === "object" &&
+              "description" in deck.metadata &&
+              deck.metadata?.description && (
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium">Opis:</p>
+                  <p className="text-muted-foreground">{deck.metadata.description as string}</p>
+                </div>
+              )}
+          </div>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <span className="flex flex-col gap-1">
               <strong>Utworzono:</strong> {formatDate(deck.created_at)}
             </span>
-            <span>
+            <span className="flex flex-col gap-1">
               <strong>Ostatnia aktualizacja:</strong> {formatDate(deck.updated_at)}
             </span>
           </div>
