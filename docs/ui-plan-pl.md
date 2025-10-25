@@ -202,19 +202,61 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
 
 
 ### 2.4. Widoki tworzenia fiszek
+
+#### 2.4.1. Ręczne Tworzenie Fiszek ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Ręczne Tworzenie Fiszek
 - **Ścieżka widoku:** `/decks/{deckId}/flashcards/new`
 - **Główny cel:** Umożliwienie użytkownikom dodawania nowych fiszek ręcznie z odpowiednimi walidacjami formularza.
-- **Kluczowe informacje do wyświetlenia:** Formularz z polami na wprowadzenie treści fiszki (`front`, `back`), wybór typu fiszki oraz komunikaty walidacyjne.
-- **Kluczowe komponenty widoku:** Elementy formularza, komunikaty walidacyjne inline, przycisk zapisu wysyłający dane do API.
-- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** Walidacja błędów w locie, etykiety dostępne dla czytników ekranowych, bezpieczne przesyłanie danych do API.
+- **Kluczowe informacje do wyświetlenia:** 
+  - Formularz z polami na wprowadzenie treści fiszki (`front` - max 200 znaków, `back` - max 500 znaków)
+  - Wybór typu fiszki (RadioGroup: "Pytanie-Odpowiedź" lub "Luki")
+  - Liczniki znaków w czasie rzeczywistym z wizualnym wskaźnikiem (zmiana koloru przy 90% i 100% limitu)
+  - Komunikaty walidacyjne inline dla każdego pola
+  - Komunikat sukcesu po utworzeniu fiszki
+- **Kluczowe komponenty widoku:** 
+  - `ManualFlashcardView.tsx` - główny komponent widoku z integracją hooka i nawigacją
+  - `FlashcardForm.tsx` - formularz z trzema głównymi polami (type, front, back)
+  - `CharacterCount.tsx` - komponent licznika znaków z ARIA live region
+  - `useManualFlashcardForm` - custom hook zarządzający stanem formularza i logiką walidacji
+- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** 
+  - Walidacja w czasie rzeczywistym z czyszczeniem błędów podczas wpisywania
+  - Walidacja przed wysłaniem: pola wymagane, maksymalna długość, trimowanie białych znaków
+  - Etykiety ARIA dla wszystkich pól (`aria-required`, `aria-invalid`, `aria-describedby`)
+  - Role `alert` dla komunikatów o błędach
+  - Nawigacja klawiaturą przez wszystkie elementy formularza
+  - Bezpieczne przesyłanie danych do API POST `/api/decks/{deckId}/flashcards`
+  - Weryfikacja własności talii po stronie serwera
+  - Obsługa błędów API z mapowaniem na konkretne pola formularza
+  - Automatyczne przekierowanie do widoku talii po sukcesie (1.5s opóźnienia)
+  - Przycisk powrotu do szczegółów talii
+  - Responsywny design (max-width: 2xl, wyśrodkowany)
+  - Wsparcie dla trybu ciemnego
 
-- **Nazwa widoku:** Propozycje Fiszek Generowanych przez AI
-- **Ścieżka widoku:** `/decks/{deckId}/generations/new`
-- **Główny cel:** Umożliwienie użytkownikom wprowadzenia tekstu, na podstawie którego AI wygeneruje propozycje fiszek, z możliwością ich przeglądu i akceptacji.
-- **Kluczowe informacje do wyświetlenia:** Pole tekstowe na wprowadzenie tekstu źródłowego, podgląd wygenerowanych propozycji fiszek, komunikaty o dziennych limitach generacji oraz instrukcje awaryjne w przypadku błędu API.
-- **Kluczowe komponenty widoku:** Pole textarea, wskaźniki ładowania, komponenty kart z propozycjami, przyciski do akceptacji lub odrzucenia propozycji.
-- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** Jasna informacja zwrotna podczas wywołań API, informowanie o błędach w przypadku awarii AI, zarządzanie fokusem podczas przeglądania propozycji oraz transparentna informacja o limitach dziennych.
+**Szczegóły implementacji:**
+- **Główny komponent:** `ManualFlashcardView.tsx` - React component z pełną interaktywnością, renderowany przez Astro z `client:load`
+- **Strona Astro:** `decks/[deckId]/flashcards/new.astro` - dynamiczna ścieżka z walidacją parametru deckId
+- **Custom Hook:** `useManualFlashcardForm.ts` - zarządza stanem formularza (front, back, type, isLoading, errors), walidacją i integracją z API
+- **Komponenty pomocnicze:**
+  - `FlashcardForm.tsx` - formularz z RadioGroup dla typu, Textarea dla front/back, przyciskami Reset i Submit
+  - `CharacterCount.tsx` - licznik znaków z kolorowym wskaźnikiem (szary → żółty przy 90% → czerwony przy 100%)
+- **Integracja z API:**
+  - POST `/api/decks/{deckId}/flashcards` - tworzenie fiszki
+    - Body: `{ flashcards: [{ type, front, back, source: "manual", generation_id: null, deck_id, is_accepted: true }] }`
+    - Response 201: utworzona fiszka
+    - Response 400: błędy walidacji z mapowaniem na pola
+    - Response 404: brak talii lub brak uprawnień
+    - Response 500: błąd serwera
+- **Accessibility:**
+  - Semantyczna struktura HTML
+  - Prawidłowe powiązania label-input
+  - ARIA attributes dla stanów błędów i wymaganych pól
+  - Zarządzanie fokusem
+  - Wsparcie dla czytników ekranowych
+- **Walidacja:**
+  - Front: wymagane, max 200 znaków, trimowane
+  - Back: wymagane, max 500 znaków, trimowane
+  - Type: "question-answer" (domyślnie) lub "gaps"
+  - Source: automatycznie ustawiane na "manual"
 
 ### 2.5. Widok sesji nauki
 - **Nazwa widoku:** Sesja Nauki/Recenzji
