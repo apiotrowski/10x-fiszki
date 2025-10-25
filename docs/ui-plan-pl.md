@@ -258,6 +258,85 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Type: "question-answer" (domyślnie) lub "gaps"
   - Source: automatycznie ustawiane na "manual"
 
+### 2.4.2. Widok edycji fiszki ✅ ZAIMPLEMENTOWANE
+- **Nazwa widoku:** Edycja Fiszki
+- **Ścieżka widoku:** `/decks/[deckId]/flashcards/[flashcardId]/edit`
+- **Główny cel:** Umożliwienie użytkownikowi edycji istniejącej fiszki w talii, z zachowaniem wszystkich funkcji walidacji i dostępności.
+- **Kluczowe informacje do wyświetlenia:** 
+  - Formularz z polami na edycję treści fiszki (`front` - max 200 znaków, `back` - max 500 znaków)
+  - Wybór typu fiszki (RadioGroup: "question-answer" lub "gaps")
+  - Liczniki znaków w czasie rzeczywistym z wizualnym wskaźnikiem (zmiana koloru przy 90% i 100% limitu)
+  - Komunikaty walidacyjne inline dla każdego pola
+  - Komunikat sukcesu po zapisaniu zmian
+  - Wstępne wypełnienie formularza aktualnymi danymi fiszki
+- **Kluczowe komponenty widoku:** 
+  - `EditFlashcardView.tsx` - główny komponent widoku z integracją hooka i nawigacją
+  - `FlashcardForm.tsx` - ten sam komponent formularza co w widoku tworzenia (reużywalny)
+  - `CharacterCount.tsx` - komponent licznika znaków z ARIA live region
+  - `useEditFlashcardForm` - custom hook zarządzający stanem formularza, ładowaniem danych i logiką walidacji
+- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** 
+  - Ładowanie aktualnych danych fiszki przy inicjalizacji widoku
+  - Wskaźnik ładowania podczas pobierania danych fiszki
+  - Walidacja w czasie rzeczywistym z czyszczeniem błędów podczas wpisywania
+  - Walidacja przed wysłaniem: pola wymagane, maksymalna długość, trimowanie białych znaków
+  - Wszystkie pola są opcjonalne (częściowa aktualizacja), ale przynajmniej jedno musi być podane
+  - Etykiety ARIA dla wszystkich pól (`aria-required`, `aria-invalid`, `aria-describedby`)
+  - Role `alert` dla komunikatów o błędach
+  - Nawigacja klawiaturą przez wszystkie elementy formularza
+  - Bezpieczne przesyłanie danych do API PUT `/api/decks/{deckId}/flashcards/{flashcardId}`
+  - Weryfikacja własności talii i przynależności fiszki do talii po stronie serwera
+  - Obsługa błędów API z mapowaniem na konkretne pola formularza
+  - Automatyczne przekierowanie do widoku talii po sukcesie (1.5s opóźnienia)
+  - Przycisk powrotu do szczegółów talii
+  - Przycisk anulowania zmian (powrót bez zapisywania)
+  - Responsywny design (max-width: 2xl, wyśrodkowany)
+  - Wsparcie dla trybu ciemnego
+  - Automatyczna aktualizacja pola `source` na "ai-edited" jeśli edytowana jest fiszka wygenerowana przez AI
+
+**Szczegóły implementacji:**
+- **Główny komponent:** `EditFlashcardView.tsx` - React component z pełną interaktywnością, renderowany przez Astro z `client:load`
+- **Strona Astro:** `decks/[deckId]/flashcards/[flashcardId]/edit.astro` - dynamiczna ścieżka z walidacją parametrów deckId i flashcardId (format UUID)
+- **Custom Hook:** `useEditFlashcardForm.ts` - zarządza stanem formularza (front, back, type, isLoading, errors), ładowaniem danych, walidacją i integracją z API
+- **Komponenty pomocnicze:**
+  - `FlashcardForm.tsx` - reużywalny formularz z RadioGroup dla typu, Textarea dla front/back, przyciskami Anuluj i Zapisz
+  - `CharacterCount.tsx` - licznik znaków z kolorowym wskaźnikiem (szary → żółty przy 90% → czerwony przy 100%)
+- **Integracja z API:**
+  - GET `/api/decks/{deckId}/flashcards` - pobieranie listy fiszek (z filtrowaniem po flashcardId) lub dedykowany endpoint do pobrania pojedynczej fiszki
+    - Response 200: dane fiszki
+    - Response 404: brak fiszki lub brak uprawnień
+    - Response 500: błąd serwera
+  - PUT `/api/decks/{deckId}/flashcards/{flashcardId}` - częściowa aktualizacja fiszki
+    - Body: `{ front?, back?, type?, source? }` - wszystkie pola opcjonalne, przynajmniej jedno wymagane
+    - Automatyczne ustawienie `source: "ai-edited"` jeśli edytowana jest fiszka z `source: "ai-full"`
+    - Pole `source: "ai-full"` nie może być ustawione ręcznie (zabezpieczenie)
+    - Response 200: zaktualizowana fiszka z automatycznie zaktualizowanym `updated_at`
+    - Response 400: błędy walidacji z mapowaniem na pola (puste body, przekroczenie limitów znaków, nieprawidłowy typ/source)
+    - Response 404: brak talii, fiszki lub brak uprawnień (spójny komunikat dla bezpieczeństwa)
+    - Response 500: błąd serwera
+- **Accessibility:**
+  - Semantyczna struktura HTML
+  - Prawidłowe powiązania label-input
+  - ARIA attributes dla stanów błędów i wymaganych pól
+  - Zarządzanie fokusem
+  - Wsparcie dla czytników ekranowych
+  - Komunikat o ładowaniu danych dla czytników ekranowych
+  - ARIA live regions dla dynamicznych komunikatów o błędach i sukcesie
+- **Walidacja:**
+  - Front: opcjonalne, max 200 znaków, trimowane, nie może być pustym stringiem
+  - Back: opcjonalne, max 500 znaków, trimowane, nie może być pustym stringiem
+  - Type: opcjonalne, "question-answer" lub "gaps"
+  - Source: opcjonalne, "manual" lub "ai-edited" (nie "ai-full")
+  - Przynajmniej jedno pole musi być podane (walidacja po stronie klienta i serwera)
+  - Sprawdzenie czy dane zostały zmienione przed wysłaniem (optymalizacja UX)
+- **Bezpieczeństwo:**
+  - Walidacja UUID dla deckId i flashcardId
+  - Podwójna autoryzacja: własność talii + przynależność fiszki do talii
+  - Ochrona przed SQL injection przez parametryzowane zapytania Supabase
+  - Ochrona przed information disclosure (spójne odpowiedzi 404)
+  - RLS policies na poziomie bazy danych
+  - Ograniczenie możliwości nadpisania `source: "ai-full"` ręcznie
+
+
 ### 2.5. Widok sesji nauki
 - **Nazwa widoku:** Sesja Nauki/Recenzji
 - **Ścieżka widoku:** `/study-session`
