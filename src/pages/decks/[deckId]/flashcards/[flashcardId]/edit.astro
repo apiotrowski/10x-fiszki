@@ -1,0 +1,23 @@
+---
+import Layout from "../../../../../layouts/Layout.astro";
+import EditFlashcardView from "../../../../../components/EditFlashcardView";
+
+export const prerender = false;
+
+const { deckId, flashcardId } = Astro.params;
+
+// Validate deckId exists
+if (!deckId) {
+  return Astro.redirect("/decks");
+}
+
+// Validate flashcardId exists
+if (!flashcardId) {
+  return Astro.redirect(`/decks/${deckId}`);
+}
+---
+
+<Layout title="Edytuj fiszkę">
+  <EditFlashcardView client:load deckId={deckId} flashcardId={flashcardId} />
+</Layout>
+

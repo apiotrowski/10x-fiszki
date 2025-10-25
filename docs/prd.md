@@ -101,7 +101,6 @@ Kryteria akceptacji:
 - Po pomyślnym utworzeniu talii użytkownik jest przekierowywany do widoku szczegółów nowo utworzonej talii.
 - System respektuje limit 5 nowych talii dziennie (zgodnie z US-006).
 
-
 ### US-004
 ID: US-004  
 Tytuł: Podgląd widoku talli wraz z opcją zarządzania fiszkami w talii  
@@ -109,6 +108,22 @@ Opis: Jako użytkownik chcę móc obejrzeć szczegóły talii, której zobaczę 
 Kryteria akceptacji:
 - Fiszki są wyświetlane w kontekście talie, do której należą.
 - Użytkownik może edytować, usuwać lub przenosić fiszki między taliami.
+
+### US-004.1
+ID: US-004.1  
+Tytuł: Edycja fiszki  
+Opis: Jako użytkownik chcę móc edytować istniejącą fiszkę, aby poprawić lub zaktualizować jej treść bez konieczności usuwania i tworzenia nowej fiszki.  
+Kryteria akceptacji:
+- Użytkownik może edytować zarówno przód (`front`), jak i tył (`back`) fiszki.
+- Podczas edycji fiszki powinna być weryfikacja długości `front` (maksymalnie 200 znaków) i `back` (maksymalnie 500 znaków).
+- System wyświetla komunikaty walidacyjne w czasie rzeczywistym z licznikiem pozostałych znaków.
+- Użytkownik może anulować edycję bez zapisywania zmian.
+- Po pomyślnym zapisaniu zmian system wyświetla komunikat sukcesu i aktualizuje widok fiszki.
+- Edycja fiszki nie zmienia jej źródła (`source`) ani innych metadanych poza treścią.
+- Interfejs edycji jest dostępny z widoku szczegółów talii (US-004).
+- System waliduje dane po stronie serwera przed zapisaniem zmian.
+- Użytkownik nie może zapisać fiszki z pustymi polami `front` lub `back`.
+- Nawigacja klawiaturą i etykiety ARIA zapewniają dostępność zgodnie z WCAG.
 
 ### US-005
 ID: US-005  

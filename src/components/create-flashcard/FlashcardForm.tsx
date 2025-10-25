@@ -22,13 +22,14 @@ interface FlashcardFormProps {
   onTypeChange: (value: Type) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
+  mode?: "create" | "edit";
 }
 
 const MAX_FRONT_LENGTH = 200;
 const MAX_BACK_LENGTH = 500;
 
 /**
- * Form component for creating a new flashcard manually
+ * Form component for creating or editing a flashcard manually
  * Handles user input for front, back, and type with real-time validation
  */
 export function FlashcardForm({
@@ -42,12 +43,18 @@ export function FlashcardForm({
   onTypeChange,
   onSubmit,
   onCancel,
+  mode = "create",
 }: FlashcardFormProps) {
+  const isEditMode = mode === "edit";
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Utwórz nową fiszkę</CardTitle>
-        <CardDescription>Dodaj nową fiszkę do talii poprzez wypełnienie poniższego formularza.</CardDescription>
+        <CardTitle>{isEditMode ? "Edytuj fiszkę" : "Utwórz nową fiszkę"}</CardTitle>
+        <CardDescription>
+          {isEditMode
+            ? "Wprowadź zmiany w poniższym formularzu i zapisz."
+            : "Dodaj nową fiszkę do talii poprzez wypełnienie poniższego formularza."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-6">
@@ -146,10 +153,16 @@ export function FlashcardForm({
           {/* Action Buttons */}
           <div className="flex gap-3 justify-end pt-4">
             <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-              Resetuj
+              {isEditMode ? "Anuluj" : "Resetuj"}
             </Button>
             <Button type="submit" disabled={isLoading || !front.trim() || !back.trim()}>
-              {isLoading ? "Tworzenie..." : "Utwórz fiszkę"}
+              {isLoading
+                ? isEditMode
+                  ? "Zapisywanie..."
+                  : "Tworzenie..."
+                : isEditMode
+                  ? "Zapisz zmiany"
+                  : "Utwórz fiszkę"}
             </Button>
           </div>
         </form>

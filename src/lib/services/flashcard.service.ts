@@ -167,6 +167,39 @@ export async function updateFlashcard(
 }
 
 /**
+ * Service for getting a single flashcard by ID
+ *
+ * @param supabase - Supabase client instance
+ * @param flashcardId - ID of the flashcard to fetch
+ * @returns FlashcardDTO
+ * @throws Error if flashcard not found or query fails
+ */
+export async function getFlashcardById(supabase: SupabaseClient, flashcardId: string): Promise<FlashcardDTO> {
+  const { data, error } = await supabase.from("flashcards").select("*").eq("id", flashcardId).single();
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("Błąd podczas pobierania fiszki:", error);
+    throw new Error(`Nie udało się pobrać fiszki: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error("Fiszka nie została znaleziona");
+  }
+
+  return {
+    id: data.id,
+    deck_id: data.deck_id,
+    type: data.type as "question-answer" | "gaps",
+    front: data.front,
+    back: data.back,
+    source: data.source as "manual" | "ai-full" | "ai-edited",
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+  };
+}
+
+/**
  * Service for deleting a flashcard
  *
  * @param supabase - Supabase client instance
