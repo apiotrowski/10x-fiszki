@@ -85,6 +85,64 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Wysoki kontrast dla komunikatów błędów.
   - Responsywny design dostosowany do urządzeń mobilnych i desktop.
 
+### 2.2.2. Edycja talii
+- **Nazwa widoku:** Edycja Talii
+- **Ścieżka widoku:** `/decks/{deckId}/edit`
+- **Główny cel:** Umożliwienie użytkownikowi edycji istniejącej talii poprzez aktualizację nazwy i opcjonalnego opisu, z walidacją danych oraz zachowaniem wszystkich fiszek w talii.
+- **Kluczowe informacje do wyświetlenia:** 
+  - Formularz z polem na nazwę talii (wymagane, max 100 znaków) - wypełniony aktualnymi danymi.
+  - Pole na opis talii (opcjonalne, max 500 znaków) - wypełniony aktualnymi danymi.
+  - Licznik pozostałych znaków dla obu pól.
+  - Komunikaty walidacyjne w przypadku błędnych danych.
+  - Przyciski akcji: "Zapisz zmiany" oraz "Anuluj".
+  - Informacja o dacie ostatniej modyfikacji talii.
+- **Kluczowe komponenty widoku:** 
+  - Formularz z polami input (nazwa) i textarea (opis) - wstępnie wypełniony aktualnymi danymi.
+  - Komunikaty walidacyjne inline pod każdym polem.
+  - Liczniki znaków dla pól tekstowych.
+  - Przyciski akcji z odpowiednimi stanami (disabled podczas ładowania).
+  - Wskaźnik ładowania podczas pobierania danych talii i zapisywania zmian.
+  - Toast notifications dla komunikatów o sukcesie lub błędzie.
+  - Przycisk powrotu do widoku szczegółów talii.
+  - Potwierdzenie przed opuszczeniem strony jeśli formularz zawiera niezapisane zmiany.
+- **Rozważania dotyczące UX, dostępności i bezpieczeństwa:** 
+  - Walidacja w czasie rzeczywistym z natychmiastową informacją zwrotną.
+  - Wyraźne komunikaty o błędach walidacji (puste pole, przekroczenie limitu znaków).
+  - Etykiety ARIA dla wszystkich pól formularza.
+  - Obsługa nawigacji klawiaturą (Tab, Enter do wysłania formularza, Escape do anulowania).
+  - Potwierdzenie przed opuszczeniem strony jeśli formularz zawiera niezapisane dane.
+  - Po pomyślnym zapisaniu zmian automatyczne przekierowanie do `/decks/{deckId}` z komunikatem sukcesu.
+  - Bezpieczne wywołanie API PATCH `/api/decks/{deckId}` z walidacją po stronie serwera.
+  - Weryfikacja własności talii przed umożliwieniem edycji.
+  - Wysoki kontrast dla komunikatów błędów.
+  - Responsywny design dostosowany do urządzeń mobilnych i desktop.
+  - Obsługa błędów sieciowych i błędów serwera z jasnymi komunikatami.
+  - Przycisk "Anuluj" przekierowuje do widoku szczegółów talii bez zapisywania zmian.
+
+**Szczegóły implementacji:**
+- **Główny komponent:** `EditDeckView.tsx` - React component z pełną interaktywnością
+- **Strona Astro:** `decks/[deckId]/edit.astro` - dynamiczna ścieżka z wykorzystaniem `client:load` dla hydratacji komponentu React
+- **Custom Hooks:**
+  - `useFetchDeck` - pobieranie szczegółów talii do edycji
+  - `useUpdateDeck` - obsługa aktualizacji talii
+  - `useUnsavedChanges` - wykrywanie niezapisanych zmian i potwierdzenie przed opuszczeniem
+- **Komponenty pomocnicze:**
+  - `EditDeckForm.tsx` - formularz edycji z walidacją
+  - `CharacterCounter.tsx` - licznik pozostałych znaków
+  - `FormField.tsx` - uniwersalny komponent pola formularza z walidacją
+- **Integracja z API:**
+  - GET `/api/decks/{deckId}` - pobieranie aktualnych danych talii
+  - PATCH `/api/decks/{deckId}` - aktualizacja talii z body: { title, metadata: { description } }
+- **Accessibility:**
+  - Role ARIA dla formularza i komunikatów walidacyjnych
+  - Etykiety aria-label dla wszystkich pól i przycisków
+  - Komunikaty o błędach w formacie role="alert"
+  - Obsługa nawigacji klawiaturą (Tab, Enter, Escape)
+  - Wysokie kontrasty kolorów dla różnych stanów
+  - Wskaźniki ładowania z opisowym tekstem
+  - Focus management przy wyświetlaniu błędów walidacji
+
+
 ### 2.3. Widok szczegółów talii ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Szczegóły Talii
 - **Ścieżka widoku:** `/decks/{deckId}`

@@ -101,6 +101,22 @@ Kryteria akceptacji:
 - Po pomyślnym utworzeniu talii użytkownik jest przekierowywany do widoku szczegółów nowo utworzonej talii.
 - System respektuje limit 5 nowych talii dziennie (zgodnie z US-006).
 
+### US-003.3
+ID: US-003.3  
+Tytuł: Edycja talii  
+Opis: Jako użytkownik chcę móc edytować istniejącą talię, aby zaktualizować jej nazwę lub opis bez konieczności usuwania i tworzenia nowej talii.  
+Kryteria akceptacji:
+- Użytkownik może edytować nazwę i opis talii z widoku szczegółów talii (US-004).
+- Nazwa talii jest wymagana i powinna być walidowana (maksymalnie 100 znaków, nie może być pusta).
+- Opis talii jest opcjonalny i powinien być walidowany (maksymalnie 500 znaków).
+- System wyświetla komunikaty walidacyjne w czasie rzeczywistym z licznikiem pozostałych znaków.
+- Użytkownik może anulować edycję bez zapisywania zmian.
+- Po pomyślnym zapisaniu zmian system wyświetla komunikat sukcesu i aktualizuje widok talii.
+- System waliduje dane po stronie serwera przed zapisaniem zmian.
+- Edycja talii nie wpływa na fiszki zawarte w talii.
+- Interfejs edycji jest responsywny i dostępny zgodnie z wytycznymi WCAG.
+- Nawigacja klawiaturą i etykiety ARIA zapewniają dostępność.
+
 ### US-004
 ID: US-004  
 Tytuł: Podgląd widoku talli wraz z opcją zarządzania fiszkami w talii  
