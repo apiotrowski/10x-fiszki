@@ -22,6 +22,25 @@ export const createDeckSchema = z.object({
 });
 
 /**
+ * Validation schema for updating an existing deck
+ * Validates title (optional, 1-100 chars) and metadata (optional object)
+ * At least one field must be provided
+ */
+export const updateDeckSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Nazwa nie może być pusta")
+      .max(100, "Nazwa nie może przekraczać 100 znaków")
+      .trim()
+      .optional(),
+    metadata: z.record(z.unknown()).optional(),
+  })
+  .refine((data) => data.title !== undefined || data.metadata !== undefined, {
+    message: "Należy podać przynajmniej jedno pole do aktualizacji (title lub metadata)",
+  });
+
+/**
  * Validation schema for listing decks query parameters
  * Validates pagination parameters: page, limit, sort, and filter
  */

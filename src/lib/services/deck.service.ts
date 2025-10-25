@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { CreateDeckCommand, DeckDTO, DeckListDTO, PaginationDTO } from "../../types";
+import type { CreateDeckCommand, UpdateDeckCommand, DeckDTO, DeckListDTO, PaginationDTO } from "../../types";
 
 /**
  * Service for retrieving a deck by its ID
@@ -160,6 +160,65 @@ export async function listDecks(
   return {
     decks,
     pagination,
+  };
+}
+
+/**
+ * Service for updating a deck by its ID
+ * Validates that the deck exists and belongs to the specified user before updating
+ *
+ * @param supabase - Supabase client instance
+ * @param deckId - UUID of the deck to update
+ * @param userId - UUID of the authenticated user
+ * @param command - UpdateDeckCommand containing fields to update
+ * @returns DeckDTO containing updated deck details
+ * @throws Error if deck not found, doesn't belong to user, or update fails
+ */
+export async function updateDeck(
+  supabase: SupabaseClient,
+  deckId: string,
+  userId: string,
+  command: UpdateDeckCommand
+): Promise<DeckDTO> {
+  // Build update object with only provided fields
+  const updateData: Record<string, unknown> = {};
+
+  if (command.title !== undefined) {
+    updateData.title = command.title;
+  }
+
+  if (command.metadata !== undefined) {
+    updateData.metadata = command.metadata;
+  }
+
+  // Update the deck with both id and user_id filters
+  // This ensures authorization check is done at the database level
+  const { data, error } = await supabase
+    .from("decks")
+    .update(updateData)
+    .eq("id", deckId)
+    .eq("user_id", userId)
+    .select("id, title, metadata, created_at, updated_at, user_id")
+    .single();
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("Database error updating deck:", error);
+    throw new Error(`Failed to update deck: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error("Deck not found or you do not have permission to update it");
+  }
+
+  // Return the updated deck in DeckDTO format
+  return {
+    id: data.id,
+    title: data.title,
+    metadata: data.metadata,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+    user_id: data.user_id,
   };
 }
 

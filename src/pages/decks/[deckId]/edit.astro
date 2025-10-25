@@ -1,0 +1,18 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import EditDeckView from "../../../components/EditDeckView";
+
+export const prerender = false;
+
+const { deckId } = Astro.params;
+
+// Validate deckId exists
+if (!deckId) {
+  return Astro.redirect("/decks");
+}
+---
+
+<Layout title="Edycja talii">
+  <EditDeckView client:load deckId={deckId} />
+</Layout>
+
