@@ -83,3 +83,35 @@ export const listFlashcardsQuerySchema = z.object({
 });
 
 export type ListFlashcardsQuery = z.infer<typeof listFlashcardsQuerySchema>;
+
+/**
+ * Validation schema for updating a flashcard
+ * All fields are optional - at least one must be provided
+ * Note: source field is managed automatically by the service layer:
+ * - ai-full -> ai-edited (on any update)
+ * - manual -> manual (remains unchanged)
+ * - ai-edited -> ai-edited (remains unchanged)
+ */
+export const updateFlashcardSchema = z
+  .object({
+    type: z
+      .enum(["question-answer", "gaps"], {
+        errorMap: () => ({ message: "Type must be either 'question-answer' or 'gaps'" }),
+      })
+      .optional(),
+    front: z
+      .string()
+      .min(1, "Front content cannot be empty")
+      .max(200, "Front content must not exceed 200 characters")
+      .optional(),
+    back: z
+      .string()
+      .min(1, "Back content cannot be empty")
+      .max(500, "Back content must not exceed 500 characters")
+      .optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided for update",
+  });
+
+export type UpdateFlashcardInput = z.infer<typeof updateFlashcardSchema>;

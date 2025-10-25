@@ -88,10 +88,14 @@ export async function createFlashcards(
 
 /**
  * Service for updating an existing flashcard
+ * Automatically manages source field based on business rules:
+ * - If flashcard has source "ai-full", it will be changed to "ai-edited" on any update
+ * - If flashcard has source "manual", it remains "manual"
+ * - If flashcard has source "ai-edited", it remains "ai-edited"
  *
  * @param supabase - Supabase client instance
  * @param flashcardId - ID of the flashcard to update
- * @param updates - Fields to update
+ * @param updates - Fields to update (front, back, type)
  * @returns Updated flashcard
  * @throws Error if flashcard not found or update fails
  */
@@ -102,24 +106,52 @@ export async function updateFlashcard(
     type?: "question-answer" | "gaps";
     front?: string;
     back?: string;
-    source?: "manual" | "ai-full" | "ai-edited";
   }
 ): Promise<FlashcardDTO> {
   // Ensure at least one field is being updated
   if (Object.keys(updates).length === 0) {
-    throw new Error("No fields to update");
+    throw new Error("Brak pól do aktualizacji");
   }
 
-  const { data, error } = await supabase.from("flashcards").update(updates).eq("id", flashcardId).select().single();
+  // Step 1: Fetch current flashcard to check its source
+  const { data: currentFlashcard, error: fetchError } = await supabase
+    .from("flashcards")
+    .select("source")
+    .eq("id", flashcardId)
+    .single();
+
+  if (fetchError || !currentFlashcard) {
+    // eslint-disable-next-line no-console
+    console.error("Błąd podczas pobierania fiszki:", fetchError);
+    throw new Error("Fiszka nie została znaleziona");
+  }
+
+  // Step 2: Determine the new source based on business rules
+  const currentSource = currentFlashcard.source as "manual" | "ai-full" | "ai-edited";
+  const newSource: "manual" | "ai-edited" = currentSource === "manual" ? "manual" : "ai-edited";
+
+  // Step 3: Prepare updates with automatic source management
+  const updatesWithSource = {
+    ...updates,
+    source: newSource,
+  };
+
+  // Step 4: Perform the update
+  const { data, error } = await supabase
+    .from("flashcards")
+    .update(updatesWithSource)
+    .eq("id", flashcardId)
+    .select()
+    .single();
 
   if (error) {
     // eslint-disable-next-line no-console
-    console.error("Database error updating flashcard:", error);
-    throw new Error(`Failed to update flashcard: ${error.message}`);
+    console.error("Błąd podczas aktualizacji fiszki:", error);
+    throw new Error(`Nie udało się zaktualizować fiszki: ${error.message}`);
   }
 
   if (!data) {
-    throw new Error("Flashcard not found");
+    throw new Error("Fiszka nie została znaleziona");
   }
 
   return {
@@ -146,8 +178,8 @@ export async function deleteFlashcard(supabase: SupabaseClient, flashcardId: str
 
   if (error) {
     // eslint-disable-next-line no-console
-    console.error("Database error deleting flashcard:", error);
-    throw new Error(`Failed to delete flashcard: ${error.message}`);
+    console.error("Błąd podczas usuwania fiszki:", error);
+    throw new Error(`Nie udało się usunąć fiszki: ${error.message}`);
   }
 }
 
@@ -168,8 +200,8 @@ export async function getFlashcardsByDeck(supabase: SupabaseClient, deckId: stri
 
   if (error) {
     // eslint-disable-next-line no-console
-    console.error("Database error fetching flashcards:", error);
-    throw new Error(`Failed to fetch flashcards: ${error.message}`);
+    console.error("Błąd podczas pobierania fiszek:", error);
+    throw new Error(`Nie udało się pobrać fiszek: ${error.message}`);
   }
 
   return (
@@ -225,8 +257,8 @@ export async function getFlashcards(supabase: SupabaseClient, params: GetFlashca
 
   if (error) {
     // eslint-disable-next-line no-console
-    console.error("Database error fetching flashcards:", error);
-    throw new Error(`Failed to fetch flashcards: ${error.message}`);
+    console.error("Błąd podczas pobierania fiszek:", error);
+    throw new Error(`Nie udało się pobrać fiszek: ${error.message}`);
   }
 
   // Map data to FlashcardDTO format

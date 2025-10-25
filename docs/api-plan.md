@@ -355,18 +355,84 @@
      - Implements comprehensive error handling with clear error messages
      - Service layer handles all database interactions for better code organization
 
-3. **Update Flashcard**
+3. **Update Flashcard** ✅ IMPLEMENTED
    - **Method:** PUT
    - **URL:** `/api/decks/{deckId}/flashcards/{flashcardId}`
-   - **Description:** Update an existing flashcard.
-   - **Request Payload:** Similar to flashcard creation payload.
+   - **Description:** Update an existing flashcard's content or type. User must own the deck containing the flashcard. The `source` field is automatically managed based on business rules.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId]/flashcards/[flashcardId].ts`
+   - **Service Layer:** Uses `updateFlashcard` service from `/src/lib/services/flashcard.service.ts`
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck containing the flashcard
+     - `flashcardId` (required) - UUID of the flashcard to update
+   - **Request Payload:** (all fields optional, but at least one required)
+     ```json
+     {
+         "front": "Updated question text (max 200 chars)",
+         "back": "Updated answer text (max 500 chars)",
+         "type": "question-answer"
+     }
+     ```
+   - **Automatic Source Management:**
+     - If flashcard has `source: "ai-full"` → automatically changed to `"ai-edited"` on any update
+     - If flashcard has `source: "manual"` → remains `"manual"`
+     - If flashcard has `source: "ai-edited"` → remains `"ai-edited"`
+     - Users cannot manually set the source field (it's managed automatically)
+   - **Response Payload:**
+     ```json
+     {
+         "id": "uuid",
+         "deck_id": "uuid",
+         "type": "question-answer",
+         "front": "Updated question text",
+         "back": "Updated answer text",
+         "source": "ai-edited",
+         "created_at": "timestamp",
+         "updated_at": "timestamp"
+     }
+     ```
    - **Success Codes:** 200 OK
-   - **Error Codes:** 400 Bad Request, 404 Not Found, 401 Unauthorized
-   - **Validation rules:**
-     - check length of `front` (max 200 characters)
-     - check length of `back` (max 500 characters)
-     - check available type of flashards (available types: `question-answer`, `gaps`)
-     - check source (available types: `manual`, `ai-edited`)
+   - **Error Codes:**
+     - 400 Bad Request (invalid UUID format, validation errors, or empty request body)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck not found, flashcard not found, or flashcard doesn't belong to deck)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schema in `/src/lib/validations/generation.validation.ts`)
+     - `deckId` must be a valid UUID v4 format
+     - `flashcardId` must be a valid UUID v4 format
+     - At least one field must be provided in request body
+     - `front` content: minimum 1 character (if provided), maximum 200 characters
+     - `back` content: minimum 1 character (if provided), maximum 500 characters
+     - `type` must be one of: "question-answer", "gaps" (if provided)
+     - `source` field is NOT accepted in request body (managed automatically by service layer)
+   - **Key Implementation Details:**
+     - Validates both UUID formats before querying database
+     - Verifies deck ownership using `verifyDeckOwnership` helper
+     - Confirms flashcard exists and belongs to specified deck
+     - Only updates fields that are provided in request body (partial updates)
+     - Automatically manages `source` field based on current flashcard state
+     - Fetches current flashcard first to determine appropriate source value
+     - Returns complete updated flashcard with new `updated_at` timestamp
+     - Returns 404 (not 403) for unauthorized access to prevent information disclosure
+     - Comprehensive validation with detailed error messages for each field
+   - **Security Features:**
+     - Dual authorization check: deck ownership + flashcard-deck relationship
+     - UUID validation prevents injection attacks
+     - Input sanitization via Zod schema validation
+     - No information disclosure (same 404 for various error scenarios)
+     - Parameterized queries via Supabase client
+     - Users can only update flashcards from their own decks
+     - Source field managed automatically - users cannot manually override it
+   - **Performance Optimizations:**
+     - Deck ownership verified with single query via helper function
+     - Flashcard existence and relationship verified in one query
+     - Additional query to fetch current source before update (required for automatic source management)
+     - Update operation is single database query
+     - Only specified fields are updated (partial update support)
+     - Database trigger automatically updates `updated_at` timestamp
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/update-flashcard-implementation-plan.md`
+     - Examples & Testing: `/docs/examples/update-flashcard-example.md`
+     - Test Cases: `/docs/testing/update-flashcard-test-cases.md`
 
 4. **Delete Flashcard** ✅ IMPLEMENTED
    - **Method:** DELETE
