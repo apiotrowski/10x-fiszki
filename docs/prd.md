@@ -54,9 +54,14 @@ ID: US-001
 Tytuł: Rejestracja i logowanie użytkownika  
 Opis: Jako nowy użytkownik chcę móc zarejestrować się i zalogować przy użyciu adresu email oraz hasła, aby uzyskać dostęp do funkcjonalności platformy.  
 Kryteria akceptacji:
-- Użytkownik może rejestrować się, podając unikalny adres email i hasło.
-- Po rejestracji użytkownik otrzymuje potwierdzenie i może zalogować się.
+- Logowanie i Rejestracja powinna się odbywać na oddzielnych podstronach
+- Odzyskiwanie hasła powinno być możliwe.
+- Użytkownik może rejestrować się, podając unikalny adres email i hasło, wraz z powtórzeniem hasła.
+- Po rejestracji użytkownik otrzymuje potwierdzenie na email i może zalogować się.
 - System zapewnia poprawne zarządzanie sesją użytkownika.
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
 
 ### US-002
 ID: US-002  
