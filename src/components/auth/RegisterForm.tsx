@@ -79,11 +79,37 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
     setSuccessMessage("");
 
     try {
+      // Use custom onSubmit if provided, otherwise use default API call
       if (onSubmit) {
         await onSubmit(email, password, confirmPassword);
         setSuccessMessage(
           "Rejestracja zakończona pomyślnie! Sprawdź swoją skrzynkę email i potwierdź adres, aby aktywować konto."
         );
+        // Clear form
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        // Call the register API endpoint
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password, confirmPassword }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Wystąpił błąd podczas rejestracji. Spróbuj ponownie.");
+        }
+
+        // Show success message
+        setSuccessMessage(
+          data.message || "Rejestracja zakończona pomyślnie! Sprawdź swoją skrzynkę email i potwierdź adres."
+        );
+
         // Clear form
         setEmail("");
         setPassword("");

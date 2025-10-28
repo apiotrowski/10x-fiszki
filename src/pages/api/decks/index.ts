@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import type { CreateDeckCommand } from "../../../types";
 import { createDeckSchema, listDecksQuerySchema } from "../../../lib/validations/deck.validation";
 import { createDeck, listDecks } from "../../../lib/services/deck.service";
-import { DEFAULT_USER_ID } from "../../../db/supabase.client";
 
 export const prerender = false;
 
@@ -18,7 +17,19 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ request, locals }) => {
   const supabase = locals.supabase;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Extract and parse query parameters from URL
   const url = new URL(request.url);
@@ -96,7 +107,19 @@ export const GET: APIRoute = async ({ request, locals }) => {
  */
 export const POST: APIRoute = async ({ request, locals }) => {
   const supabase = locals.supabase;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Parse request body
   let requestBody;

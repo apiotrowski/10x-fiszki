@@ -1,6 +1,11 @@
 ---
 import AuthLayout from "../../layouts/AuthLayout.astro";
 import { RegisterForm } from "../../components/auth/RegisterForm";
+
+// If user is already logged in, redirect to home page
+if (Astro.locals.user) {
+  return Astro.redirect("/");
+}
 ---
 
 <AuthLayout title="Rejestracja - 10x Flashcards">

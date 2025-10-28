@@ -55,8 +55,27 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
     setErrors({});
 
     try {
+      // Use custom onSubmit if provided, otherwise use default API call
       if (onSubmit) {
         await onSubmit(email, password);
+      } else {
+        // Call the login API endpoint
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Wystąpił błąd podczas logowania. Spróbuj ponownie.");
+        }
+
+        // Redirect to List of decks on successful login
+        window.location.href = "/decks";
       }
     } catch (error) {
       setErrors({

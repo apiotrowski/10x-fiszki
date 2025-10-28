@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { verifyDeckOwnership } from "../../../../../lib/auth.helper";
-import { DEFAULT_USER_ID } from "../../../../../db/supabase.client";
 import { deleteFlashcard, updateFlashcard, getFlashcardById } from "../../../../../lib/services/flashcard.service";
 import { updateFlashcardSchema } from "../../../../../lib/validations/generation.validation";
 import { z } from "zod";
@@ -32,7 +31,19 @@ const uuidSchema = z.string().uuid("Błędny format UUID");
 export const GET: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
   const { deckId, flashcardId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {
@@ -169,7 +180,19 @@ export const GET: APIRoute = async ({ params, locals }) => {
 export const DELETE: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
   const { deckId, flashcardId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {
@@ -313,7 +336,19 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   const supabase = locals.supabase;
   const { deckId, flashcardId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {

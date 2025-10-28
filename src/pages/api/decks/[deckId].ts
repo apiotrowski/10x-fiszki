@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import type { UpdateDeckCommand } from "../../../types";
 import { deckIdParamSchema, updateDeckSchema } from "../../../lib/validations/deck.validation";
-import { DEFAULT_USER_ID } from "../../../db/supabase.client";
 import { getDeckById, updateDeck, deleteDeck } from "../../../lib/services/deck.service";
 
 export const prerender = false;
@@ -14,7 +13,19 @@ export const prerender = false;
 export const GET: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
   const { deckId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {
@@ -99,7 +110,19 @@ export const GET: APIRoute = async ({ params, locals }) => {
 export const PATCH: APIRoute = async ({ params, locals, request }) => {
   const supabase = locals.supabase;
   const { deckId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {
@@ -225,7 +248,19 @@ export const PATCH: APIRoute = async ({ params, locals, request }) => {
 export const DELETE: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
   const { deckId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Step 1: Validate deckId parameter
   if (!deckId) {

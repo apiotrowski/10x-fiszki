@@ -51,11 +51,36 @@ export function ResetPasswordForm({ onSubmit }: ResetPasswordFormProps) {
     setSuccessMessage("");
 
     try {
+      // Use custom onSubmit if provided, otherwise use default API call
       if (onSubmit) {
         await onSubmit(email);
         setSuccessMessage(
           "Link do resetowania hasła został wysłany na podany adres email. Sprawdź swoją skrzynkę pocztową."
         );
+        // Clear form
+        setEmail("");
+      } else {
+        // Call the reset password API endpoint
+        const response = await fetch("/api/auth/reset-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Wystąpił błąd podczas wysyłania linku resetującego. Spróbuj ponownie.");
+        }
+
+        // Show success message
+        setSuccessMessage(
+          data.message ||
+            "Jeśli podany adres email istnieje w naszej bazie, otrzymasz wiadomość z instrukcjami resetowania hasła."
+        );
+
         // Clear form
         setEmail("");
       }

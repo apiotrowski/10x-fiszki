@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { generateFlashcardsSchema } from "../../../../lib/validations/generation.validation";
 import { verifyDeckOwnership } from "../../../../lib/auth.helper";
-import { DEFAULT_USER_ID } from "../../../../db/supabase.client";
 import { generateFlashcards } from "../../../../lib/services/generation.service";
 import type { GenerateFlashcardsResponseDTO } from "../../../../types";
 
@@ -14,7 +13,19 @@ export const prerender = false;
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const supabase = locals.supabase;
   const { deckId } = params;
-  const userId = DEFAULT_USER_ID;
+  const userId = locals.user?.id;
+
+  if (!userId) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized",
+      }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 
   // Validate deckId parameter
   if (!deckId) {
