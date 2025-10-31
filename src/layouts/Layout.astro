@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { TopNavigation } from "@/components/TopNavigation";
 
 interface Props {
   title?: string;
@@ -7,6 +8,7 @@ interface Props {
 
 const { title = "Fiszki" } = Astro.props;
 const { user } = Astro.locals;
+const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -21,8 +23,12 @@ const { user } = Astro.locals;
   <body class="dark">
     <div class="min-h-screen flex flex-col">
       <header class="border-b border-border">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="container mx-auto px-4 py-4 flex items-center">
           <a href="/" class="text-xl font-bold hover:text-primary transition-colors">Fiszki</a>
+
+          <div class="flex-1 flex justify-center">
+            {user && <TopNavigation currentPath={currentPath} client:load />}
+          </div>
 
           {
             user ? (
