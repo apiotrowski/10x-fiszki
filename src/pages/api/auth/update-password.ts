@@ -3,10 +3,16 @@ import { z } from "zod";
 
 import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
-// Validation schema for password reset request
-const resetPasswordSchema = z.object({
-  email: z.string().email("Nieprawidłowy format adresu email"),
-});
+// Validation schema for password update
+const updatePasswordSchema = z
+  .object({
+    password: z.string().min(6, "Hasło musi mieć co najmniej 6 znaków").max(72, "Hasło może mieć maksymalnie 72 znaki"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Hasła nie są identyczne",
+    path: ["confirmPassword"],
+  });
 
 export const prerender = false;
 
@@ -14,7 +20,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Parse and validate request body
     const body = await request.json();
-    const validationResult = resetPasswordSchema.safeParse(body);
+    const validationResult = updatePasswordSchema.safeParse(body);
 
     if (!validationResult.success) {
       return new Response(
@@ -31,7 +37,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    const { email } = validationResult.data;
+    const { password } = validationResult.data;
 
     // Create Supabase server instance with cookie handling
     const supabase = createSupabaseServerInstance({
@@ -39,25 +45,21 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       headers: request.headers,
     });
 
-    // Request password reset email
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${new URL(request.url).origin}/auth/reset-password`,
+    // Update user's password
+    const { error } = await supabase.auth.updateUser({
+      password,
     });
-
-    console.log("redirectTo", `${new URL(request.url).origin}/auth/reset-password`);
 
     if (error) {
       // Log error for debugging (keep for production monitoring)
-      console.error("Password reset error:", error);
+      console.error("Password update error:", error);
 
-      // Return generic success message for security (don't reveal if email exists)
       return new Response(
         JSON.stringify({
-          message:
-            "Jeśli podany adres email istnieje w naszej bazie, otrzymasz wiadomość z instrukcjami resetowania hasła.",
+          error: "Nie udało się zaktualizować hasła. Link resetujący mógł wygasnąć.",
         }),
         {
-          status: 200,
+          status: 400,
           headers: {
             "Content-Type": "application/json",
           },
@@ -65,11 +67,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Successful request (always return success for security)
+    // Successful password update
     return new Response(
       JSON.stringify({
-        message:
-          "Jeśli podany adres email istnieje w naszej bazie, otrzymasz wiadomość z instrukcjami resetowania hasła.",
+        message: "Hasło zostało pomyślnie zaktualizowane",
       }),
       {
         status: 200,
@@ -80,11 +81,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     );
   } catch (error) {
     // Log error for debugging (keep for production monitoring)
-    console.error("Password reset error:", error);
+    console.error("Password update error:", error);
 
     return new Response(
       JSON.stringify({
-        error: "Wystąpił błąd podczas resetowania hasła. Spróbuj ponownie.",
+        error: "Wystąpił błąd podczas aktualizacji hasła. Spróbuj ponownie.",
       }),
       {
         status: 500,

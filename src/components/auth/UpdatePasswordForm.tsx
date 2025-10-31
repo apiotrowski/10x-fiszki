@@ -4,20 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface RegisterFormProps {
-  onSubmit?: (email: string, password: string, confirmPassword: string) => Promise<void>;
+interface UpdatePasswordFormProps {
+  onSubmit?: (password: string) => Promise<void>;
 }
 
 /**
- * Registration form component
- * Handles user input for email, password, and password confirmation with validation
+ * Update password form component
+ * Handles user input for new password after clicking reset link
  */
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
-  const [email, setEmail] = useState("");
+export function UpdatePasswordForm({ onSubmit }: UpdatePasswordFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{
-    email?: string;
     password?: string;
     confirmPassword?: string;
     submit?: string;
@@ -25,36 +23,15 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password: string): string | undefined => {
-    if (!password) {
-      return "Hasło jest wymagane";
-    }
-    if (password.length < 8) {
-      return "Hasło musi mieć co najmniej 8 znaków";
-    }
-    if (password.length > 72) {
-      return "Hasło nie może przekraczać 72 znaków";
-    }
-    return undefined;
-  };
-
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
 
-    if (!email.trim()) {
-      newErrors.email = "Adres email jest wymagany";
-    } else if (!validateEmail(email)) {
-      newErrors.email = "Wprowadź poprawny adres email";
-    }
-
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      newErrors.password = passwordError;
+    if (!password) {
+      newErrors.password = "Hasło jest wymagane";
+    } else if (password.length < 6) {
+      newErrors.password = "Hasło musi mieć co najmniej 6 znaków";
+    } else if (password.length > 72) {
+      newErrors.password = "Hasło może mieć maksymalnie 72 znaki";
     }
 
     if (!confirmPassword) {
@@ -81,46 +58,43 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
     try {
       // Use custom onSubmit if provided, otherwise use default API call
       if (onSubmit) {
-        await onSubmit(email, password, confirmPassword);
-        setSuccessMessage("Rejestracja zakończona pomyślnie! Przekierowanie do listy talii za 2 sekundy...");
-        // Clear form
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
+        await onSubmit(password);
+        setSuccessMessage("Hasło zostało pomyślnie zaktualizowane");
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = "/auth/login";
+        }, 2000);
       } else {
-        // Call the register API endpoint
-        const response = await fetch("/api/auth/register", {
+        // Call the update password API endpoint
+        const response = await fetch("/api/auth/update-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, confirmPassword }),
+          body: JSON.stringify({ password, confirmPassword }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || "Wystąpił błąd podczas rejestracji. Spróbuj ponownie.");
+          throw new Error(data.error || "Wystąpił błąd podczas aktualizacji hasła. Spróbuj ponownie.");
         }
 
         // Show success message
-        setSuccessMessage(
-          data.message || "Rejestracja zakończona pomyślnie! Przekierowanie do listy talii za 2 sekundy..."
-        );
+        setSuccessMessage(data.message || "Hasło zostało pomyślnie zaktualizowane");
 
         // Clear form
-        setEmail("");
         setPassword("");
         setConfirmPassword("");
 
         // Redirect to login after 2 seconds
         setTimeout(() => {
-          window.location.href = "/decks";
+          window.location.href = "/auth/login";
         }, 2000);
       }
     } catch (error) {
       setErrors({
-        submit: error instanceof Error ? error.message : "Wystąpił błąd podczas rejestracji. Spróbuj ponownie.",
+        submit: error instanceof Error ? error.message : "Wystąpił błąd podczas aktualizacji hasła. Spróbuj ponownie.",
       });
     } finally {
       setIsLoading(false);
@@ -130,44 +104,15 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Utwórz konto</CardTitle>
-        <CardDescription>Wypełnij formularz, aby utworzyć nowe konto</CardDescription>
+        <CardTitle>Ustaw nowe hasło</CardTitle>
+        <CardDescription>Wprowadź nowe hasło dla swojego konta</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Field */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-base">
-              Email <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) {
-                  setErrors((prev) => ({ ...prev, email: undefined }));
-                }
-              }}
-              placeholder="twoj@email.com"
-              disabled={isLoading}
-              aria-required="true"
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              autoComplete="email"
-            />
-            {errors.email && (
-              <p id="email-error" className="text-sm text-red-500" role="alert">
-                {errors.email}
-              </p>
-            )}
-          </div>
-
           {/* Password Field */}
           <div className="space-y-2">
             <Label htmlFor="password" className="text-base">
-              Hasło <span className="text-red-500">*</span>
+              Nowe hasło <span className="text-red-500">*</span>
             </Label>
             <Input
               id="password"
@@ -183,12 +128,9 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
               disabled={isLoading}
               aria-required="true"
               aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error password-hint" : "password-hint"}
+              aria-describedby={errors.password ? "password-error" : undefined}
               autoComplete="new-password"
             />
-            <p id="password-hint" className="text-xs text-muted-foreground">
-              Hasło musi mieć co najmniej 8 znaków
-            </p>
             {errors.password && (
               <p id="password-error" className="text-sm text-red-500" role="alert">
                 {errors.password}
@@ -198,11 +140,11 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirm-password" className="text-base">
+            <Label htmlFor="confirmPassword" className="text-base">
               Potwierdź hasło <span className="text-red-500">*</span>
             </Label>
             <Input
-              id="confirm-password"
+              id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => {
@@ -215,11 +157,11 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
               disabled={isLoading}
               aria-required="true"
               aria-invalid={!!errors.confirmPassword}
-              aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
+              aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
               autoComplete="new-password"
             />
             {errors.confirmPassword && (
-              <p id="confirm-password-error" className="text-sm text-red-500" role="alert">
+              <p id="confirmPassword-error" className="text-sm text-red-500" role="alert">
                 {errors.confirmPassword}
               </p>
             )}
@@ -232,6 +174,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
               role="status"
             >
               <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
+              <p className="text-xs text-green-500 dark:text-green-500 mt-1">Przekierowanie do strony logowania...</p>
             </div>
           )}
 
@@ -247,17 +190,16 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
           {/* Action Buttons */}
           <div className="space-y-4 pt-2">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Rejestracja..." : "Zarejestruj się"}
+            <Button type="submit" className="w-full" disabled={isLoading || !!successMessage}>
+              {isLoading ? "Aktualizowanie..." : "Zaktualizuj hasło"}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
-              Masz już konto?{" "}
               <a
                 href="/auth/login"
                 className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
               >
-                Zaloguj się
+                Powrót do logowania
               </a>
             </div>
           </div>
