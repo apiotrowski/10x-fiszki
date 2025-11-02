@@ -1,7 +1,6 @@
 # build output
 dist/
-
-# generated types
+.output/
 .astro/
 
 # dependencies
@@ -16,17 +15,24 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.local
 
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
-.idea/
-.ai/
+# test results
+coverage/
+test-results/
+playwright-report/
+html/
 
-docs2/
-
-# IDEA from jetbrains
-.idea/
-# VScode from Microsoft
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Supabase
+supabase/.branches
+supabase/.temp

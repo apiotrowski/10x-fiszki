@@ -23,6 +23,13 @@ The AI Flashcards Generation Platform is a web-based solution designed to stream
   - **Supabase**: Provides database management, authentication, and server-side functionalities.
 - **AI Integration**:  
   - **Openrouter.ai**: Connects the platform with advanced AI models for generating flashcards.
+- **Testing**:  
+  - **Vitest**: Modern and fast testing framework for unit and integration tests.
+  - **React Testing Library**: Testing library for React components focusing on user behavior.
+  - **Playwright**: End-to-end testing framework for automating user scenarios across browsers.
+  - **Supertest**: HTTP assertion library for testing API endpoints.
+  - **MSW (Mock Service Worker)**: API mocking library for intercepting network requests in tests.
+  - **Storybook + Chromatic**: Tools for isolated component development and visual regression testing.
 
 ## Getting Started Locally
 To set up the project on your local machine, follow these steps:

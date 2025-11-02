@@ -22,3 +22,22 @@
 - Openrouter.ai
   - Opis: Usługa umożliwiająca komunikację z silnikiem AI, wspierającą generowanie treści (np. automatyczne tworzenie fiszek).
   - Przeznaczenie: Pozwala na integrację z zaawansowanymi modelami AI, co umożliwia realizację specyficznej funkcjonalności platformy – generacji treści edukacyjnych.
+# Testowanie
+- Vitest
+  - Opis: Nowoczesny i błyskawiczny framework testowy zbudowany na bazie Vite, zapewniający szybkie wykonywanie testów jednostkowych i integracyjnych.
+  - Przeznaczenie: Umożliwia efektywne testowanie logiki biznesowej, funkcji pomocniczych, schematów walidacji oraz komponentów React, zapewniając wysoką jakość kodu.
+- React Testing Library
+  - Opis: Biblioteka do testowania komponentów React w sposób zbliżony do rzeczywistego użytkowania przez użytkownika końcowego.
+  - Przeznaczenie: Pozwala na testowanie komponentów UI z perspektywy użytkownika, co zapewnia lepszą jakość i użyteczność interfejsu.
+- Playwright
+  - Opis: Nowoczesny framework do testów end-to-end, umożliwiający automatyzację scenariuszy użytkownika w różnych przeglądarkach (Chrome, Firefox, WebKit).
+  - Przeznaczenie: Służy do weryfikacji krytycznych ścieżek użytkownika w działającej aplikacji, zapewniając, że kluczowe funkcjonalności działają poprawnie w środowisku produkcyjnym.
+- Supertest
+  - Opis: Biblioteka do testowania HTTP, umożliwiająca testowanie punktów końcowych API bez uruchamiania przeglądarki.
+  - Przeznaczenie: Pozwala na testowanie integracyjne endpointów API Astro, weryfikując poprawność komunikacji między warstwami aplikacji.
+- MSW (Mock Service Worker)
+  - Opis: Narzędzie do mockowania API, które przechwytuje żądania sieciowe na poziomie frontendu.
+  - Przeznaczenie: Umożliwia testowanie komponentów frontendowych w izolacji od rzeczywistego API, co przyspiesza testy i zwiększa ich niezawodność.
+- Storybook + Chromatic
+  - Opis: Storybook to narzędzie do izolowanego tworzenia i dokumentowania komponentów UI, a Chromatic służy do automatycznego wykrywania wizualnych regresji.
+  - Przeznaczenie: Pozwala na rozwój komponentów w izolacji oraz automatyczne wykrywanie niechcianych zmian wizualnych, co zapewnia spójność interfejsu użytkownika.
