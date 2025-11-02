@@ -96,6 +96,7 @@ export async function generateFlashcards(
     source: "ai-full" as const,
     generation_id: generationData?.id || null,
     deck_id: deckId,
+    is_accepted: false,
   }));
 
   // Step 7: Return response with proposals
