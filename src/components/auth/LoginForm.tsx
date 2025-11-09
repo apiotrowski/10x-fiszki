@@ -87,13 +87,13 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md" data-testid="login-form-card">
       <CardHeader>
         <CardTitle>Zaloguj się</CardTitle>
         <CardDescription>Wprowadź swoje dane, aby uzyskać dostęp do konta</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form" noValidate>
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-base">
@@ -115,9 +115,10 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
               autoComplete="email"
+              data-testid="login-email-input"
             />
             {errors.email && (
-              <p id="email-error" className="text-sm text-red-500" role="alert">
+              <p id="email-error" className="text-sm text-red-500" role="alert" data-testid="login-email-error">
                 {errors.email}
               </p>
             )}
@@ -144,9 +145,10 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? "password-error" : undefined}
               autoComplete="current-password"
+              data-testid="login-password-input"
             />
             {errors.password && (
-              <p id="password-error" className="text-sm text-red-500" role="alert">
+              <p id="password-error" className="text-sm text-red-500" role="alert" data-testid="login-password-error">
                 {errors.password}
               </p>
             )}
@@ -167,6 +169,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
             <div
               className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
               role="alert"
+              data-testid="login-submit-error"
             >
               <p className="text-sm text-red-600 dark:text-red-400">{errors.submit}</p>
             </div>
@@ -174,7 +177,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
 
           {/* Action Buttons */}
           <div className="space-y-4 pt-2">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading} data-testid="login-submit-button">
               {isLoading ? "Logowanie..." : "Zaloguj się"}
             </Button>
 

@@ -9,5 +9,7 @@ if (Astro.locals.user) {
 ---
 
 <AuthLayout title="Logowanie - 10x Fiszki">
-  <LoginForm client:load />
+  <div data-testid="login-page">
+    <LoginForm client:load />
+  </div>
 </AuthLayout>
