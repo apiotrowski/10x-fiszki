@@ -1,5 +1,7 @@
 # AI Flashcards Generation Platform
 
+[![CI/CD Status](https://github.com/apiotrowski/10x-fiszki/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/apiotrowski/10x-fiszki/actions/workflows/ci-cd.yml)
+
 ## Table of Contents
 - [Project Description](#project-description)
 - [Tech Stack](#tech-stack)
@@ -60,12 +62,25 @@ To set up the project on your local machine, follow these steps:
    ```
 
 ## Available Scripts
+
+### Development
 - **`npm run dev`**: Start the development server.
 - **`npm run build`**: Build the project for production.
 - **`npm run preview`**: Preview the production build locally.
+
+### Code Quality
 - **`npm run lint`**: Run ESLint to analyze code quality.
 - **`npm run lint:fix`**: Automatically fix linting issues.
 - **`npm run format`**: Format the code using Prettier.
+
+### Testing
+- **`npm run test`**: Run unit tests with Vitest.
+- **`npm run test:watch`**: Run unit tests in watch mode.
+- **`npm run test:coverage`**: Generate test coverage report.
+- **`npm run test:e2e`**: Run end-to-end tests with Playwright.
+- **`npm run test:e2e:ui`**: Run E2E tests with Playwright UI.
+
+For more details about testing and CI/CD, see [docs/ci-cd-setup.md](docs/ci-cd-setup.md).
 
 ## Project Scope
 This project is currently in the MVP stage. Key features include:

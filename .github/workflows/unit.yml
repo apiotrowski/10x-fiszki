@@ -1,10 +1,12 @@
-name: Test & Build Master
+# ⚠️ DEPRECATED: This workflow is replaced by ci-cd.yml
+# Please use the unified CI/CD pipeline instead
+# This file is kept for reference only
+
+name: Test & Build Master (DEPRECATED)
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  # Disabled - use ci-cd.yml instead
+  workflow_dispatch:
 
 jobs:
   test:
