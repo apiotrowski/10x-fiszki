@@ -157,11 +157,13 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint & Unit Tests | ${{ needs.lint-and-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Production Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           
-          if [ "${{ needs.lint-and-test.result }}" == "success" ] && \
+          if [ "${{ needs.lint.result }}" == "success" ] && \
+             [ "${{ needs.unit-tests.result }}" == "success" ] && \
              [ "${{ needs.e2e-tests.result }}" == "success" ] && \
              [ "${{ needs.build.result }}" == "success" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
