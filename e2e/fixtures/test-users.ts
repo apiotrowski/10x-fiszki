@@ -14,7 +14,7 @@ export interface TestUser {
  */
 export const validTestUser: TestUser = {
   email: "andrzejp@gmail.com",
-  password: "rambo8.z123",
+  password: "password.123",
   name: "Andrzej Piotrowski",
 };
 
