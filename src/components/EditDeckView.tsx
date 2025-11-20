@@ -116,7 +116,10 @@ export default function EditDeckView({ deckId }: EditDeckViewProps) {
             </Button>
           </div>
 
-          <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md" role="alert">
+          <div
+            className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+            role="alert"
+          >
             <h2 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">Błąd ładowania talii</h2>
             <p className="text-sm text-red-600 dark:text-red-400">{deckError || "Nie udało się załadować talii"}</p>
           </div>
@@ -172,4 +175,3 @@ export default function EditDeckView({ deckId }: EditDeckViewProps) {
     </div>
   );
 }
-

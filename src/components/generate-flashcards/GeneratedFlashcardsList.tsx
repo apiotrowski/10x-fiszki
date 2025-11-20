@@ -38,8 +38,7 @@ export function GeneratedFlashcardsList({
         <div>
           <h2 className="text-2xl font-bold">Wygenerowane fiszki</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Zaakceptowano: <span className="font-semibold">{acceptedCount}</span> /{" "}
-            {proposals.length}
+            Zaakceptowano: <span className="font-semibold">{acceptedCount}</span> / {proposals.length}
           </p>
         </div>
 
@@ -67,18 +66,10 @@ export function GeneratedFlashcardsList({
       </div>
 
       {/* Flashcards List */}
-      <div
-        className="space-y-4"
-        role="list"
-        aria-label="Lista wygenerowanych fiszek"
-      >
+      <div className="space-y-4" role="list" aria-label="Lista wygenerowanych fiszek">
         {proposals.map((proposal) => (
           <div key={proposal.id} role="listitem">
-            <FlashcardPreviewCard
-              proposal={proposal}
-              onToggle={onToggleProposal}
-              isDisabled={isDisabled}
-            />
+            <FlashcardPreviewCard proposal={proposal} onToggle={onToggleProposal} isDisabled={isDisabled} />
           </div>
         ))}
       </div>
@@ -90,12 +81,10 @@ export function GeneratedFlashcardsList({
           role="alert"
         >
           <p className="text-sm">
-            ⚠️ Nie zaakceptowano żadnej fiszki. Zaznacz przynajmniej jedną fiszkę, aby móc je
-            zapisać.
+            ⚠️ Nie zaakceptowano żadnej fiszki. Zaznacz przynajmniej jedną fiszkę, aby móc je zapisać.
           </p>
         </div>
       )}
     </div>
   );
 }
-

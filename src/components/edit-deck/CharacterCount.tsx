@@ -26,4 +26,3 @@ export function CharacterCount({ count, max }: CharacterCountProps) {
     </span>
   );
 }
-

@@ -37,9 +37,7 @@ export function GenerationProgress() {
       </div>
 
       {/* Hidden text for screen readers */}
-      <span className="sr-only">
-        Trwa generowanie fiszek przez AI. Proszę czekać.
-      </span>
+      <span className="sr-only">Trwa generowanie fiszek przez AI. Proszę czekać.</span>
 
       <style>{`
         @keyframes progress {
@@ -60,4 +58,3 @@ export function GenerationProgress() {
     </div>
   );
 }
-

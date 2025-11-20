@@ -35,7 +35,7 @@ export default function EditFlashcardView({ deckId, flashcardId }: EditFlashcard
    */
   useEffect(() => {
     fetchFlashcard(deckId, flashcardId);
-  }, [deckId, flashcardId]);
+  }, [deckId, flashcardId, fetchFlashcard]);
 
   /**
    * Handle form submission
@@ -159,4 +159,3 @@ export default function EditFlashcardView({ deckId, flashcardId }: EditFlashcard
     </div>
   );
 }
-

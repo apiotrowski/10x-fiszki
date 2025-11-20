@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 
@@ -9,7 +9,7 @@ function Button({ onClick, children }: { onClick: () => void; children: React.Re
 
 describe("Example Component Test", () => {
   it("should render a button", () => {
-    render(<Button onClick={() => {}}>Click me</Button>);
+    render(<Button onClick={vi.fn()}>Click me</Button>);
 
     const button = screen.getByRole("button", { name: /click me/i });
     expect(button).toBeInTheDocument();

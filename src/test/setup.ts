@@ -24,14 +24,19 @@ Object.defineProperty(window, "matchMedia", {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() {
+  disconnect() {
+    return;
+  }
+  observe() {
+    return;
+  }
+  takeRecords(): IntersectionObserverEntry[] {
     return [];
   }
-  unobserve() {}
-} as any;
+  unobserve() {
+    return;
+  }
+} as unknown as typeof IntersectionObserver;
 
 // Extend Vitest matchers
 expect.extend({});

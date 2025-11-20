@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Type, FlashcardDTO, UpdateFlashcardCommand } from "../../types";
 
 interface UseEditFlashcardFormReturn {
@@ -256,4 +256,3 @@ export function useEditFlashcardForm(): UseEditFlashcardFormReturn {
     fetchFlashcard,
   };
 }
-

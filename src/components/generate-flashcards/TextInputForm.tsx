@@ -48,9 +48,7 @@ export function TextInputForm({
         <div className="flex justify-between items-center mt-2">
           <p
             id="character-count-info"
-            className={`text-sm ${
-              !isTextValid && characterCount > 0 ? "text-destructive" : "text-muted-foreground"
-            }`}
+            className={`text-sm ${!isTextValid && characterCount > 0 ? "text-destructive" : "text-muted-foreground"}`}
             aria-live="polite"
           >
             Liczba znaków: {characterCount} / 10000
@@ -118,4 +116,3 @@ export function TextInputForm({
     </div>
   );
 }
-

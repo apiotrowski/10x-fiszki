@@ -40,14 +40,13 @@ export function SaveConfirmationModal({
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                Zamierzasz zapisać tylko <strong>{acceptedCount}</strong> z{" "}
-                <strong>{totalCount}</strong> wygenerowanych fiszek.
+                Zamierzasz zapisać tylko <strong>{acceptedCount}</strong> z <strong>{totalCount}</strong> wygenerowanych
+                fiszek.
               </p>
               {rejectedCount > 0 && (
                 <p className="text-destructive">
-                  <strong>{rejectedCount}</strong>{" "}
-                  {rejectedCount === 1 ? "fiszka zostanie" : "fiszki zostaną"} pominięte i nie
-                  będą zapisane.
+                  <strong>{rejectedCount}</strong> {rejectedCount === 1 ? "fiszka zostanie" : "fiszki zostaną"}{" "}
+                  pominięte i nie będą zapisane.
                 </p>
               )}
               <p>Czy na pewno chcesz kontynuować?</p>
@@ -66,4 +65,3 @@ export function SaveConfirmationModal({
     </AlertDialog>
   );
 }
-

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +32,11 @@ export function DeleteDeckDialog({ isOpen, deckTitle, onConfirm, onCancel, isDel
           <AlertDialogCancel disabled={isDeleting} onClick={onCancel}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction disabled={isDeleting} onClick={onConfirm} className="bg-destructive hover:bg-destructive/90">
+          <AlertDialogAction
+            disabled={isDeleting}
+            onClick={onConfirm}
+            className="bg-destructive hover:bg-destructive/90"
+          >
             {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -41,4 +44,3 @@ export function DeleteDeckDialog({ isOpen, deckTitle, onConfirm, onCancel, isDel
     </AlertDialog>
   );
 }
-

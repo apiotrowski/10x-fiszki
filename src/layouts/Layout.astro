@@ -70,27 +70,27 @@ const currentPath = Astro.url.pathname;
 </html>
 
 <script>
+  /* eslint-disable */
   const logoutBtn = document.getElementById("logout-btn");
 
-  logoutBtn?.addEventListener("click", async () => {
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-      });
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+        });
 
-      if (response.ok) {
-        window.location.href = "/";
-      } else {
-        // Log error for debugging
-        console.error("Logout failed");
-        alert("Nie udało się wylogować. Spróbuj ponownie.");
+        if (response.ok) {
+          window.location.href = "/";
+        } else {
+          alert("Nie udało się wylogować. Spróbuj ponownie.");
+        }
+      } catch (_error) {
+        alert("Wystąpił błąd podczas wylogowania.");
       }
-    } catch (error) {
-      // Log error for debugging
-      console.error("Logout error:", error);
-      alert("Wystąpił błąd podczas wylogowania.");
-    }
-  });
+    });
+  }
+  /* eslint-enable */
 </script>
 
 <style>

@@ -13,4 +13,3 @@ export function useCharacterCount(text: string): number {
 
   return characterCount;
 }
-
