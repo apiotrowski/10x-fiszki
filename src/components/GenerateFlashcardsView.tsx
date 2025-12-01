@@ -36,7 +36,7 @@ export default function GenerateFlashcardsView({ deckId }: GenerateFlashcardsVie
 
   // Handlers
   const handleGenerate = async () => {
-    const result = await generateFlashcards(deckId, sourceText);
+    const result = await generateFlashcards(deckId, sourceText, numberOfFlashcards);
 
     if (result) {
       if (result.flashcard_proposals.length === 0) {

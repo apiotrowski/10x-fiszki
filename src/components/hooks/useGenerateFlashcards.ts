@@ -4,7 +4,11 @@ import type { GenerateFlashcardsResponseDTO } from "../../types";
 interface UseGenerateFlashcardsResult {
   isGenerating: boolean;
   error: string | null;
-  generateFlashcards: (deckId: string, text: string) => Promise<GenerateFlashcardsResponseDTO | null>;
+  generateFlashcards: (
+    deckId: string,
+    text: string,
+    numberOfFlashcards: number
+  ) => Promise<GenerateFlashcardsResponseDTO | null>;
 }
 
 /**
@@ -15,7 +19,11 @@ export function useGenerateFlashcards(): UseGenerateFlashcardsResult {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const generateFlashcards = async (deckId: string, text: string): Promise<GenerateFlashcardsResponseDTO | null> => {
+  const generateFlashcards = async (
+    deckId: string,
+    text: string,
+    numberOfFlashcards: number
+  ): Promise<GenerateFlashcardsResponseDTO | null> => {
     setIsGenerating(true);
     setError(null);
 
@@ -25,7 +33,7 @@ export function useGenerateFlashcards(): UseGenerateFlashcardsResult {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, numberOfFlashcards }),
       });
 
       if (!response.ok) {

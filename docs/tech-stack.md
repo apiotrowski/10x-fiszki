@@ -19,8 +19,8 @@
   - Opis: Kompleksowa platforma backendowa oparta na PostgreSQL, oferująca wbudowane rozwiązania takie jak uwierzytelnianie, zarządzanie bazą danych i funkcje serwerowe.
   - Przeznaczenie: Umożliwia szybkie wdrożenie backendu bez konieczności pisania niestandardowych rozwiązań od zera, co jest idealne dla MVP i szybkiego skalowania.
 # Komunikacja z modelami AI
-- Openrouter.ai
-  - Opis: Usługa umożliwiająca komunikację z silnikiem AI, wspierającą generowanie treści (np. automatyczne tworzenie fiszek).
+- OpenAi api
+  - Opis: Usługa umożliwiająca komunikację z silnikiem AI z rodziny OpenAi, wspierającą generowanie treści (np. automatyczne tworzenie fiszek).
   - Przeznaczenie: Pozwala na integrację z zaawansowanymi modelami AI, co umożliwia realizację specyficznej funkcjonalności platformy – generacji treści edukacyjnych.
 # Testowanie
 - Vitest

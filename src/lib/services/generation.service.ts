@@ -7,6 +7,7 @@ interface GenerateFlashcardsParams {
   text: string;
   deckId: string;
   userId: string;
+  numberOfFlashcards: number;
 }
 
 /**
@@ -47,7 +48,7 @@ export async function generateFlashcards(
   supabase: SupabaseClient,
   params: GenerateFlashcardsParams
 ): Promise<GenerateFlashcardsResponseDTO> {
-  const { text, deckId, userId } = params;
+  const { text, deckId, userId, numberOfFlashcards } = params;
   const startTime = Date.now();
 
   // Step 1: Check daily generation limit
@@ -60,7 +61,7 @@ export async function generateFlashcards(
   // Step 3: Call AI service to generate flashcards
   // AI generates both question-answer and gaps type flashcards
   // Expected: 10-15 flashcards for ~1000 chars, 30-50 for ~10000 chars
-  const aiFlashcards = await generateFlashcardsWithAI(text);
+  const aiFlashcards = await generateFlashcardsWithAI(text, numberOfFlashcards);
 
   // Step 4: Calculate generation duration
   const endTime = Date.now();

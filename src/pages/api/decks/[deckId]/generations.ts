@@ -71,6 +71,11 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     );
   }
 
+  let numberOfFlashcards = requestBody.numberOfFlashcards;
+  if (!numberOfFlashcards) {
+    numberOfFlashcards = 3;
+  }
+
   // Validate input with Zod schema
   const validationResult = generateFlashcardsSchema.safeParse(requestBody);
 
@@ -100,6 +105,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       text,
       deckId,
       userId,
+      numberOfFlashcards,
     });
 
     return new Response(JSON.stringify(generationResult), {

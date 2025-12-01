@@ -40,6 +40,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
+      const numberOfFlashcards = 3;
 
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
@@ -75,6 +76,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -88,6 +90,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
+      const numberOfFlashcards = 3;
 
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
@@ -106,6 +109,7 @@ describe("generation.service", () => {
           text,
           deckId,
           userId,
+          numberOfFlashcards,
         })
       ).rejects.toThrow("DAILY_LIMIT_EXCEEDED");
     });
@@ -115,6 +119,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
+      const numberOfFlashcards = 3;
 
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
@@ -136,6 +141,7 @@ describe("generation.service", () => {
           text,
           deckId,
           userId,
+          numberOfFlashcards,
         })
       ).rejects.toThrow("Failed to check daily limit: Database error");
     });
@@ -145,6 +151,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
+      const numberOfFlashcards = 3;
 
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
@@ -180,6 +187,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -195,7 +203,7 @@ describe("generation.service", () => {
       const text = "a".repeat(1000);
       const generationId = "gen-789";
       const createdAt = new Date().toISOString();
-
+      const numberOfFlashcards = 3;
       const mockAIFlashcards = [
         {
           type: "question-answer" as const,
@@ -240,6 +248,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert - Response structure
@@ -274,7 +283,7 @@ describe("generation.service", () => {
       // Assert - Service calls
       expect(calculateTextLength).toHaveBeenCalledWith(text);
       expect(calculateTextHash).toHaveBeenCalledWith(text);
-      expect(generateFlashcardsWithAI).toHaveBeenCalledWith(text);
+      expect(generateFlashcardsWithAI).toHaveBeenCalledWith(text, numberOfFlashcards);
 
       // Assert - Database calls
       expect(mockInsert).toHaveBeenCalledWith({
@@ -292,7 +301,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -332,6 +341,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -350,7 +360,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockAIFlashcards = [
         { type: "question-answer" as const, front: "Q1", back: "A1" },
         { type: "gaps" as const, front: "G1", back: "[gap1]" },
@@ -388,6 +398,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -404,7 +415,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -443,6 +454,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert - Should still return results despite metadata error
@@ -462,7 +474,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -484,6 +496,7 @@ describe("generation.service", () => {
           text,
           deckId,
           userId,
+          numberOfFlashcards,
         })
       ).rejects.toThrow("AI service unavailable");
     });
@@ -493,7 +506,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -524,6 +537,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -543,7 +557,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "Special chars: <>&\"'`\n\t" + "a".repeat(990);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -580,6 +594,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -592,7 +607,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -629,6 +644,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert
@@ -644,7 +660,7 @@ describe("generation.service", () => {
       const userId = "user-123";
       const deckId = "deck-456";
       const text = "a".repeat(1000);
-
+      const numberOfFlashcards = 3;
       const mockSelect = vi.fn().mockReturnThis();
       const mockEq = vi.fn().mockReturnThis();
       const mockGte = vi.fn().mockResolvedValue({ count: 0, error: null });
@@ -678,6 +694,7 @@ describe("generation.service", () => {
         text,
         deckId,
         userId,
+        numberOfFlashcards,
       });
 
       // Assert

@@ -18,7 +18,7 @@ Użytkownicy często zmagają się z czasochłonnym zadaniem ręcznego tworzenia
 ## 3. Wymagania funkcjonalne
 1. Generowanie fiszek przy użyciu AI:
    - Użytkownik wkleja tekst (zakres od 1000 do 10000 słów).
-   - Użytkownik określa liczbę fiszek do wygenerowania oraz poziom trudności.
+   - Użytkownik określa liczbę fiszek do wygenerowania.
    - Model powinien wygenerować:
      - Fiszki pytanie-odpowiedź.
      - Fiszki z lukami do uzupełnienia.

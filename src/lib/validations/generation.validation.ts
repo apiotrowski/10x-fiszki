@@ -7,11 +7,30 @@ import { z } from "zod";
 export const generateFlashcardsSchema = z.object({
   text: z
     .string()
-    .min(1000, "Text must be at least 1000 characters long")
-    .max(10000, "Text must not exceed 10000 characters"),
+    .min(1000, "Tekst jest za krótki. Wymagane minimum 1000 znaków.")
+    .max(10000, "Tekst jest za długi. Maksymalnie 10000 znaków."),
 });
 
 export type GenerateFlashcardsInput = z.infer<typeof generateFlashcardsSchema>;
+
+/**
+ * Validation schema for OpenAI service input parameters
+ * Validates text length and number of flashcards to generate
+ */
+export const openAIGenerateInputSchema = z.object({
+  text: z
+    .string({ required_error: "Tekst wejściowy jest wymagany i musi być ciągiem znaków" })
+    .min(1, "Tekst wejściowy jest wymagany i musi być ciągiem znaków")
+    .min(1000, "Tekst jest za krótki. Wymagane minimum 1000 znaków.")
+    .max(10000, "Tekst jest za długi. Maksymalnie 10000 znaków."),
+  numberOfFlashcards: z
+    .number({ required_error: "Liczba fiszek musi być dodatnią liczbą całkowitą" })
+    .int("Liczba fiszek musi być dodatnią liczbą całkowitą")
+    .positive("Liczba fiszek musi być dodatnią liczbą całkowitą")
+    .max(100, "Maksymalnie 100 fiszek może zostać wygenerowanych na raz"),
+});
+
+export type OpenAIGenerateInput = z.infer<typeof openAIGenerateInputSchema>;
 
 /**
  * Validation schema for individual flashcard from AI generation
@@ -20,8 +39,8 @@ export const aiFlashcardSchema = z.object({
   type: z.enum(["question-answer", "gaps"], {
     errorMap: () => ({ message: "Type must be either 'question-answer' or 'gaps'" }),
   }),
-  front: z.string().max(200, "Front content must not exceed 200 characters"),
-  back: z.string().max(500, "Back content must not exceed 500 characters"),
+  front: z.string().max(200, "Przód fiszki nie może przekraczać 200 znaków"),
+  back: z.string().max(500, "Tył fiszki nie może przekraczać 500 znaków"),
 });
 
 /**
@@ -30,8 +49,8 @@ export const aiFlashcardSchema = z.object({
 export const aiGenerationResponseSchema = z.object({
   flashcards: z
     .array(aiFlashcardSchema)
-    .min(1, "At least one flashcard must be generated")
-    .max(100, "Maximum 100 flashcards can be generated at once"),
+    .min(1, "Należy wygenerować przynajmniej jedną fiszkę")
+    .max(100, "Maksymalnie 100 fiszek może zostać wygenerowanych na raz"),
 });
 
 export type AIFlashcard = z.infer<typeof aiFlashcardSchema>;
@@ -42,12 +61,12 @@ export type AIGenerationResponse = z.infer<typeof aiGenerationResponseSchema>;
  */
 export const flashcardProposalSchema = z.object({
   type: z.enum(["question-answer", "gaps"], {
-    errorMap: () => ({ message: "Type must be either 'question-answer' or 'gaps'" }),
+    errorMap: () => ({ message: "Typ fiszki musi być albo 'question-answer' albo 'gaps'" }),
   }),
-  front: z.string().min(1, "Front content cannot be empty").max(200, "Front content must not exceed 200 characters"),
-  back: z.string().min(1, "Back content cannot be empty").max(500, "Back content must not exceed 500 characters"),
+  front: z.string().min(1, "Treść fiszki nie może być pusta").max(200, "Przód fiszki nie może przekraczać 200 znaków"),
+  back: z.string().min(1, "Treść fiszki nie może być pusta").max(500, "Tył fiszki nie może przekraczać 500 znaków"),
   source: z.enum(["manual", "ai-full"], {
-    errorMap: () => ({ message: "Source must be either 'manual' or 'ai-full'" }),
+    errorMap: () => ({ message: "Źródło fiszki musi być albo 'manual' albo 'ai-full'" }),
   }),
 });
 
@@ -57,8 +76,8 @@ export const flashcardProposalSchema = z.object({
 export const createFlashcardsSchema = z.object({
   flashcards: z
     .array(flashcardProposalSchema)
-    .min(1, "At least one flashcard must be provided")
-    .max(100, "Maximum 100 flashcards can be created at once"),
+    .min(1, "Należy podać przynajmniej jedną fiszkę")
+    .max(100, "Maksymalnie 100 fiszek może zostać utworzonych na raz"),
 });
 
 export type FlashcardProposal = z.infer<typeof flashcardProposalSchema>;
@@ -72,12 +91,18 @@ export const listFlashcardsQuerySchema = z.object({
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 1))
-    .pipe(z.number().int().positive("Page must be a positive integer")),
+    .pipe(z.number().int().positive("Strona musi być dodatnią liczbą całkowitą")),
   limit: z
     .string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : 10))
-    .pipe(z.number().int().positive("Limit must be a positive integer").max(100, "Limit cannot exceed 100")),
+    .pipe(
+      z
+        .number()
+        .int()
+        .positive("Limit musi być dodatnią liczbą całkowitą")
+        .max(100, "Limit nie może przekraczać 100 elementów")
+    ),
   sort: z.enum(["created_at", "updated_at"]).optional().default("created_at"),
   filter: z.enum(["question-answer", "gaps", "manual", "ai-full", "ai-edited"]).optional(),
 });
@@ -96,22 +121,22 @@ export const updateFlashcardSchema = z
   .object({
     type: z
       .enum(["question-answer", "gaps"], {
-        errorMap: () => ({ message: "Type must be either 'question-answer' or 'gaps'" }),
+        errorMap: () => ({ message: "Typ fiszki musi być albo 'question-answer' albo 'gaps'" }),
       })
       .optional(),
     front: z
       .string()
-      .min(1, "Front content cannot be empty")
-      .max(200, "Front content must not exceed 200 characters")
+      .min(1, "Treść fiszki nie może być pusta")
+      .max(200, "Przód fiszki nie może przekraczać 200 znaków")
       .optional(),
     back: z
       .string()
-      .min(1, "Back content cannot be empty")
-      .max(500, "Back content must not exceed 500 characters")
+      .min(1, "Treść fiszki nie może być pusta")
+      .max(500, "Tył fiszki nie może przekraczać 500 znaków")
       .optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
-    message: "At least one field must be provided for update",
+    message: "Należy podać przynajmniej jedno pole do aktualizacji (typ fiszki, przód lub tył fiszki)",
   });
 
 export type UpdateFlashcardInput = z.infer<typeof updateFlashcardSchema>;
