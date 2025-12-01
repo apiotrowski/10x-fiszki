@@ -71,6 +71,7 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright)
     runs-on: ubuntu-latest
+    environment: integration
     needs: [lint, unit-tests]
     timeout-minutes: 60
 
@@ -94,6 +95,12 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
 
       - name: Upload Playwright report
         if: always()
@@ -126,6 +133,9 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

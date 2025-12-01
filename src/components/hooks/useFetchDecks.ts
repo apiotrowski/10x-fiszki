@@ -83,7 +83,7 @@ export function useFetchDecks(params: UseFetchDecksParams): UseFetchDecksResult 
       // Stop loading
       setIsLoading(false);
     }
-  }, [params.page, params.limit, params.sort, params.filter, params.order]);
+  }, [params.page, params.limit, params.sort, params.filter]);
 
   return {
     decks,
