@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { createFlashcardsSchema, listFlashcardsQuerySchema } from "../../../../lib/validations/generation.validation";
 import { verifyDeckOwnership } from "../../../../lib/auth.helper";
 import { createFlashcards, getFlashcards } from "../../../../lib/services/flashcard.service";
+import { refreshFlashcardsAmount } from "../../../../lib/services/deck.service";
 
 export const prerender = false;
 
@@ -112,6 +113,9 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       flashcards: flashcardProposals,
       deckId,
     });
+
+    // Step 6: Refresh flashcards amount
+    await refreshFlashcardsAmount(supabase, deckId, userId);
 
     // Step 6: Return successful response
     return new Response(JSON.stringify(result), {

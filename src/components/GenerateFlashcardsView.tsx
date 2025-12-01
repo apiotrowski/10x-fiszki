@@ -18,7 +18,7 @@ interface GenerateFlashcardsViewProps {
 export default function GenerateFlashcardsView({ deckId }: GenerateFlashcardsViewProps) {
   // Form state
   const [sourceText, setSourceText] = useState<string>("");
-  const [numberOfFlashcards, setNumberOfFlashcards] = useState<number>(20);
+  const [numberOfFlashcards, setNumberOfFlashcards] = useState<number>(3);
 
   // UI state
   const [showResults, setShowResults] = useState<boolean>(false);

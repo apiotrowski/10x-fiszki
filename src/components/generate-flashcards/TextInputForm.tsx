@@ -25,6 +25,25 @@ export function TextInputForm({
   const characterCount = useCharacterCount(sourceText);
   const isTextValid = characterCount >= 1000 && characterCount <= 10000;
   const canGenerate = isTextValid && !isGenerating;
+  // Auto-adjust number of flashcards based on text length
+  const handleSourceTextChange = (text: string) => {
+    onSourceTextChange(text);
+
+    const charCount = text.length;
+
+    // Calculate proportional number of flashcards
+    // 1000 chars = 3 flashcards, 10000 chars = 50 flashcards
+    if (charCount <= 1000) {
+      onNumberOfFlashcardsChange(3);
+    } else if (charCount >= 10000) {
+      onNumberOfFlashcardsChange(50);
+    } else {
+      // Linear interpolation between 3 and 50 for character counts between 1000 and 10000
+      const proportion = (charCount - 1000) / (10000 - 1000);
+      const calculatedCount = Math.round(3 + proportion * (50 - 3));
+      onNumberOfFlashcardsChange(calculatedCount);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -38,7 +57,7 @@ export function TextInputForm({
           className="w-full min-h-[400px] p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder="Wklej tutaj tekst źródłowy (1000-10000 znaków)..."
           value={sourceText}
-          onChange={(e) => onSourceTextChange(e.target.value)}
+          onChange={(e) => handleSourceTextChange(e.target.value)}
           disabled={isGenerating}
           aria-describedby="character-count-info validation-info"
           aria-invalid={characterCount > 0 && !isTextValid}
@@ -73,19 +92,19 @@ export function TextInputForm({
         <input
           id="flashcard-count"
           type="range"
-          min="10"
+          min="3"
           max="50"
-          step="5"
+          step="1"
           value={numberOfFlashcards}
           onChange={(e) => onNumberOfFlashcardsChange(Number(e.target.value))}
           className="w-full"
           disabled={isGenerating}
-          aria-valuemin={10}
+          aria-valuemin={3}
           aria-valuemax={50}
           aria-valuenow={numberOfFlashcards}
         />
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
-          <span>10</span>
+          <span>3</span>
           <span>50</span>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { verifyDeckOwnership } from "../../../../../lib/auth.helper";
 import { deleteFlashcard, updateFlashcard, getFlashcardById } from "../../../../../lib/services/flashcard.service";
+import { refreshFlashcardsAmount } from "../../../../../lib/services/deck.service";
 import { updateFlashcardSchema } from "../../../../../lib/validations/generation.validation";
 import { z } from "zod";
 
@@ -293,6 +294,9 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
     // Step 6: Delete the flashcard
     await deleteFlashcard(supabase, flashcardId);
+
+    // Step 7: Refresh flashcards amount
+    await refreshFlashcardsAmount(supabase, deckId, userId);
 
     // Step 7: Return success response (204 No Content)
     return new Response(null, {

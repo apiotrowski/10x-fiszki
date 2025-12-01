@@ -253,3 +253,39 @@ export async function deleteDeck(supabase: SupabaseClient, deckId: string, userI
     throw new Error("Deck not found or you do not have permission to delete it");
   }
 }
+
+export async function refreshFlashcardsAmount(supabase: SupabaseClient, deckId: string, userId: string): Promise<void> {
+  const { count, error } = await supabase.from("flashcards").select("count", { count: "exact" }).eq("deck_id", deckId);
+
+  if (error) {
+    throw new Error(`Failed to refresh flashcards amount: ${error.message}`);
+  }
+
+  if (count === null) {
+    throw new Error("Failed to refresh flashcards amount: No data returned");
+  }
+
+  // Fetch current deck to get existing metadata
+  const { data: deckData, error: deckError } = await supabase
+    .from("decks")
+    .select("metadata")
+    .eq("id", deckId)
+    .eq("user_id", userId)
+    .single();
+
+  if (deckError) {
+    throw new Error(`Failed to fetch deck metadata: ${deckError.message}`);
+  }
+
+  if (!deckData) {
+    throw new Error("Deck not found or you do not have permission to access it");
+  }
+
+  // Update deck with refreshed flashcards count
+  const currentMetadata =
+    deckData.metadata && typeof deckData.metadata === "object" && !Array.isArray(deckData.metadata)
+      ? deckData.metadata
+      : {};
+  const updatedMetadata = { ...currentMetadata, flashcards_count: count };
+  await supabase.from("decks").update({ metadata: updatedMetadata }).eq("id", deckId).eq("user_id", userId);
+}

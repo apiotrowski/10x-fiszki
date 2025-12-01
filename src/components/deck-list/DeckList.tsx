@@ -22,9 +22,9 @@ export function DeckList({ decks, onDeckClick, onDeckDelete }: DeckListProps) {
     });
   };
 
-  const getFlashcardCount = (deck: DeckDTO): number => {
-    if (deck.metadata && typeof deck.metadata === "object" && "flashcard_count" in deck.metadata) {
-      return deck.metadata.flashcard_count as number;
+  const getFlashcardsCount = (deck: DeckDTO): number => {
+    if (deck.metadata && typeof deck.metadata === "object" && "flashcards_count" in deck.metadata) {
+      return deck.metadata.flashcards_count as number;
     }
     return 0;
   };
@@ -83,7 +83,7 @@ export function DeckList({ decks, onDeckClick, onDeckDelete }: DeckListProps) {
                     <rect width="16" height="20" x="4" y="2" rx="2" />
                     <path d="M16 2v20" />
                   </svg>
-                  <span>{getFlashcardCount(deck)}</span>
+                  <span>{getFlashcardsCount(deck)}</span>
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground">{formatDate(deck.created_at)}</TableCell>
