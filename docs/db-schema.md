@@ -41,11 +41,31 @@ This table should be managed by Supbase Auth
 - generation_duration: INTERVAL NOT NULL
 - created_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 
+### learning_sessions
+- id: UUID PRIMARY KEY DEFAULT gen_random_uuid()
+- user_id: UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+- deck_id: UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE
+- started_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+- ended_at: TIMESTAMP WITH TIME ZONE NULL
+
+### learning_session_responses
+- id: UUID PRIMARY KEY DEFAULT gen_random_uuid()
+- session_id: UUID NOT NULL REFERENCES learning_sessions(id) ON DELETE CASCADE
+- flashcard_id: UUID NOT NULL REFERENCES flashcards(id) ON DELETE CASCADE
+- presented_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+- answered_at: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+- rating: VARCHAR(10) NOT NULL CHECK (rating IN ('again', 'hard', 'good', 'easy'))
+- next_review_at: TIMESTAMP WITH TIME ZONE NULL
+
 ## 2. Relacje między tabelami
 
 - Jeden użytkownik (users) może mieć wiele talii (decks) [jeden-do-wielu].
 - Jedna talia (decks) może mieć wiele fiszek (flashcards) [jeden-do-wielu].
 - Jeden użytkownik (users) może mieć wiele rekordów w tabeli generations [jeden-do-wielu].
+- Jeden użytkownik (users) może mieć wiele sesji nauki (learning_sessions) [jeden-do-wielu].
+- Jedna talia (decks) może mieć wiele sesji nauki (learning_sessions) [jeden-do-wielu].
+- Jedna sesja nauki (learning_sessions) może mieć wiele odpowiedzi (learning_session_responses) [jeden-do-wielu].
+- Jedna fiszka (flashcards) może mieć wiele odpowiedzi w różnych sesjach (learning_session_responses) [jeden-do-wielu].
 
 ## 3. Indeksy
 
@@ -53,6 +73,10 @@ This table should be managed by Supbase Auth
 - Indeks na kolumnie user_id w tabeli decks dla optymalizacji zapytań.
 - Indeks na kolumnie deck_id w tabeli flashcards dla optymalizacji zapytań.
 - Indeks na kolumnie user_id w tabeli generations dla optymalizacji zapytań.
+- Indeks na kolumnie user_id w tabeli learning_sessions dla optymalizacji zapytań.
+- Indeks na kolumnie deck_id w tabeli learning_sessions dla optymalizacji zapytań.
+- Indeks na kolumnie session_id w tabeli learning_session_responses dla optymalizacji zapytań.
+- Indeks na kolumnie flashcard_id w tabeli learning_session_responses dla optymalizacji zapytań.
 
 ## 4. Zasady PostgreSQL (RLS)
 
