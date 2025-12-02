@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { Type, FlashcardDTO, UpdateFlashcardCommand } from "../../types";
 
 interface UseEditFlashcardFormReturn {
@@ -46,8 +46,9 @@ export function useEditFlashcardForm(): UseEditFlashcardFormReturn {
 
   /**
    * Fetch existing flashcard data from API
+   * Memoized to prevent unnecessary re-renders and duplicate API calls
    */
-  const fetchFlashcard = async (deckId: string, flashcardId: string): Promise<void> => {
+  const fetchFlashcard = useCallback(async (deckId: string, flashcardId: string): Promise<void> => {
     setIsFetching(true);
     setErrors({});
 
@@ -75,7 +76,7 @@ export function useEditFlashcardForm(): UseEditFlashcardFormReturn {
     } finally {
       setIsFetching(false);
     }
-  };
+  }, []);
 
   /**
    * Update front with real-time validation

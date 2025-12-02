@@ -1,7 +1,7 @@
-# OpenRouter Service Implementation Plan
+# OpenAI Service Implementation Plan
 
 ## 1. Service Description
-The OpenRouter service is designed to interact with the OpenAI API using the gpt-4o-mini model for LLM-based chats. It will accept a text input (ranging from 1000 to 10000 words) and a desired number of flashcards to generate. The generated flashcards will adhere to the types specified in the generation validation (i.e. question-answer and gaps types), with flashcard quantity estimates aligning with the input text length (e.g., 10-15 flashcards for 1000 words and 30-50 flashcards for 10000 words).
+The OpenAI service is designed to interact with the OpenAI API using the gpt-4o-mini model for LLM-based chats. It will accept a text input (ranging from 1000 to 10000 words) and a desired number of flashcards to generate. The generated flashcards will adhere to the types specified in the generation validation (i.e. question-answer and gaps types), with flashcard quantity estimates aligning with the input text length (e.g., 10-15 flashcards for 1000 words and 30-50 flashcards for 10000 words).
 
 ## 2. Constructor Description
 The service constructor will initialize the necessary configuration properties, including:
