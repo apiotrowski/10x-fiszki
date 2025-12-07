@@ -515,14 +515,131 @@
      9. User can then accept individual flashcards or the entire list (US-002) via the bulk create flashcards endpoint
 
 #### E. Study Session with FSRS
-- **Endpoints:** `/api/study-sessions`, `/api/study-sessions/{sessionId}/next`, `/api/study-sessions/{sessionId}/review`
-- **Business Logic:**
-  - User selects deck to study
-  - System initializes session with FSRS algorithm
-  - Present cards one at a time
-  - Rating options: Again/Hard/Good/Easy
-  - Update FSRS state based on ratings
-  - Save session results
+
+1. **Create Study Session**
+   - **Method:** POST
+   - **URL:** `/api/study-sessions`
+   - **Description:** Initialize a new study session for a specific deck using the FSRS algorithm.
+   - **Implementation Status:** Not implemented
+   - **Request Payload:**
+     ```json
+     {
+         "deck_id": "uuid"
+     }
+     ```
+   - **Response Payload:**
+     ```json
+     {
+         "session_id": "uuid",
+         "deck_id": "uuid",
+         "user_id": "uuid",
+         "total_cards": 15,
+         "cards_reviewed": 0,
+         "created_at": "timestamp"
+     }
+     ```
+   - **Success Codes:** 201 Created
+   - **Error Codes:**
+     - 400 Bad Request (invalid deck_id format)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (deck doesn't exist or user doesn't own the deck)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:**
+     - `deck_id` must be a valid UUID v4 format
+     - Deck must exist and belong to authenticated user
+     - Deck must contain at least one flashcard
+   - **Business Logic:**
+     - Verify user owns the specified deck
+     - Initialize FSRS algorithm state for the session
+     - Calculate total number of cards available for study
+     - Create session record in database
+     - Return session metadata without presenting first card
+
+2. **Get Next Flashcard**
+   - **Method:** GET
+   - **URL:** `/api/study-sessions/{sessionId}/next`
+   - **Description:** Retrieve the next flashcard to study in the current session based on FSRS algorithm.
+   - **Implementation Status:** Not implemented
+   - **Path Parameters:**
+     - `sessionId` (required) - UUID of the active study session
+   - **Response Payload:**
+     ```json
+     {
+         "flashcard": {
+             "id": "uuid",
+             "type": "question-answer",
+             "front": "What is...?",
+             "back": "It is..."
+         },
+         "progress": {
+             "cards_reviewed": 5,
+             "total_cards": 15,
+             "remaining_cards": 10
+         }
+     }
+     ```
+   - **Success Codes:** 200 OK
+   - **Error Codes:**
+     - 400 Bad Request (invalid sessionId format)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (session doesn't exist or user doesn't own the session)
+     - 410 Gone (session completed, no more cards to review)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:**
+     - `sessionId` must be a valid UUID v4 format
+     - Session must exist and belong to authenticated user
+     - Session must not be completed
+   - **Business Logic:**
+     - Verify user owns the study session
+     - Use FSRS algorithm to determine next card to present
+     - Return flashcard with front side visible
+     - Update session progress metadata
+     - If no more cards available, return 410 Gone status
+
+3. **Submit Flashcard Review**
+   - **Method:** POST
+   - **URL:** `/api/study-sessions/{sessionId}/review`
+   - **Description:** Submit user's rating for the current flashcard and update FSRS state.
+   - **Implementation Status:** Not implemented
+   - **Path Parameters:**
+     - `sessionId` (required) - UUID of the active study session
+   - **Request Payload:**
+     ```json
+     {
+         "flashcard_id": "uuid",
+         "rating": "good"
+     }
+     ```
+   - **Response Payload:**
+     ```json
+     {
+         "success": true,
+         "next_review_date": "timestamp",
+         "cards_reviewed": 6,
+         "total_cards": 15
+     }
+     ```
+   - **Success Codes:** 200 OK
+   - **Error Codes:**
+     - 400 Bad Request (invalid sessionId, flashcard_id, or rating)
+     - 401 Unauthorized (not authenticated)
+     - 404 Not Found (session or flashcard doesn't exist)
+     - 409 Conflict (flashcard already reviewed in this session)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:**
+     - `sessionId` must be a valid UUID v4 format
+     - `flashcard_id` must be a valid UUID v4 format
+     - `rating` must be one of: "again", "hard", "good", "easy"
+     - Flashcard must belong to the session's deck
+     - Flashcard must not have been reviewed already in current session
+   - **Business Logic:**
+     - Verify user owns the study session
+     - Validate flashcard belongs to session's deck
+     - Update FSRS algorithm state based on rating
+     - Calculate next review date for the flashcard
+     - Save review result to database
+     - Increment cards_reviewed counter
+     - Return updated progress and next review scheduling
 
 ## 3. Authentication and Authorization
 
