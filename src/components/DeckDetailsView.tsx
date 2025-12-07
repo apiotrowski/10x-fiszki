@@ -73,6 +73,11 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
     window.location.href = `/decks/${deckId}/flashcards/new`;
   };
 
+  const handleStartStudy = () => {
+    // Navigate to study session page
+    window.location.href = `/study-session?deck_id=${deckId}`;
+  };
+
   const handleDeleteDeck = () => {
     setIsDeleteDeckModalOpen(true);
   };
@@ -180,6 +185,7 @@ export default function DeckDetailsView({ deckId }: DeckDetailsViewProps) {
             onDelete={handleDeleteDeck}
             onAddFlashcard={handleAddFlashcard}
             onAddManualFlashcard={handleAddManualFlashcard}
+            onStartStudy={handleStartStudy}
             isLoading={isDeleting}
           />
 

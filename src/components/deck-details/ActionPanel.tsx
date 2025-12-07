@@ -5,6 +5,7 @@ interface ActionPanelProps {
   onDelete?: () => void;
   onAddFlashcard?: () => void;
   onAddManualFlashcard?: () => void;
+  onStartStudy?: () => void;
   isLoading?: boolean;
 }
 
@@ -13,10 +14,33 @@ export function ActionPanel({
   onDelete,
   onAddFlashcard,
   onAddManualFlashcard,
+  onStartStudy,
   isLoading = false,
 }: ActionPanelProps) {
   return (
     <div className="flex flex-wrap gap-2 mb-6" role="toolbar" aria-label="Akcje dla talii">
+      {/* Start study session button */}
+      {onStartStudy && (
+        <Button onClick={onStartStudy} disabled={isLoading} aria-label="Rozpocznij naukę">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mr-2"
+            aria-hidden="true"
+          >
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          Rozpocznij naukę
+        </Button>
+      )}
+
       {/* Edit deck button */}
       {onEdit && (
         <Button variant="outline" onClick={onEdit} disabled={isLoading} aria-label="Edytuj talię">

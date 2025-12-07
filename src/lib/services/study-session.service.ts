@@ -8,6 +8,19 @@ import type {
 import { getDeckById } from "./deck.service";
 
 /**
+ * Type for rating a flashcard
+ */
+export type Rating = "again" | "hard" | "good" | "easy";
+
+/**
+ * Command for rating a flashcard in a study session
+ */
+export interface RateFlashcardCommand {
+  flashcard_id: string;
+  rating: Rating;
+}
+
+/**
  * Service for creating a new study session
  * Validates deck ownership and initializes FSRS session
  *
@@ -190,4 +203,131 @@ export async function getNextFlashcard(
       remaining_cards: total - cardsReviewed,
     },
   };
+}
+
+/**
+ * Service for rating a flashcard in a study session
+ * Records the user's rating and updates the FSRS algorithm state
+ *
+ * @param supabase - Supabase client instance
+ * @param sessionId - UUID of the study session
+ * @param userId - UUID of the authenticated user
+ * @param command - RateFlashcardCommand containing flashcard_id and rating
+ * @returns void on success
+ * @throws Error if session not found, user doesn't own session, or flashcard doesn't belong to deck
+ */
+export async function rateFlashcard(
+  supabase: SupabaseClient,
+  sessionId: string,
+  userId: string,
+  command: RateFlashcardCommand
+): Promise<void> {
+  const { flashcard_id, rating } = command;
+
+  // Step 1: Verify session exists and belongs to user
+  const { data: session, error: sessionError } = await supabase
+    .from("learning_sessions")
+    .select("id, user_id, deck_id, started_at, ended_at")
+    .eq("id", sessionId)
+    .eq("user_id", userId)
+    .single();
+
+  if (sessionError || !session) {
+    // eslint-disable-next-line no-console
+    console.error("Database error fetching session:", sessionError);
+    throw new Error("Sesja nie została znaleziona lub nie masz do niej dostępu");
+  }
+
+  // Step 2: Check if session has been completed
+  if (session.ended_at) {
+    throw new Error("Sesja została zakończona");
+  }
+
+  // Step 3: Verify flashcard belongs to the session's deck
+  const { data: flashcard, error: flashcardError } = await supabase
+    .from("flashcards")
+    .select("id, deck_id")
+    .eq("id", flashcard_id)
+    .eq("deck_id", session.deck_id)
+    .single();
+
+  if (flashcardError || !flashcard) {
+    // eslint-disable-next-line no-console
+    console.error("Database error fetching flashcard:", flashcardError);
+    throw new Error("Fiszka nie została znaleziona lub nie należy do tej talii");
+  }
+
+  // Step 4: Check if this flashcard was already rated in this session
+  const { data: existingResponse } = await supabase
+    .from("learning_session_responses")
+    .select("id")
+    .eq("session_id", sessionId)
+    .eq("flashcard_id", flashcard_id)
+    .single();
+
+  if (existingResponse) {
+    throw new Error("Ta fiszka została już oceniona w tej sesji");
+  }
+
+  // Step 5: Calculate next review date using simplified FSRS
+  // TODO: Implement full FSRS algorithm
+  // For MVP: Simple implementation based on rating
+  const now = new Date();
+  let nextReviewDate: Date | null = null;
+
+  switch (rating) {
+    case "again":
+      // Review again in 1 minute
+      nextReviewDate = new Date(now.getTime() + 1 * 60 * 1000);
+      break;
+    case "hard":
+      // Review in 10 minutes
+      nextReviewDate = new Date(now.getTime() + 10 * 60 * 1000);
+      break;
+    case "good":
+      // Review in 1 day
+      nextReviewDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      break;
+    case "easy":
+      // Review in 4 days
+      nextReviewDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
+      break;
+  }
+
+  // Step 6: Record the response in learning_session_responses
+  const { error: insertError } = await supabase
+    .from("learning_session_responses")
+    .insert({
+      session_id: sessionId,
+      flashcard_id: flashcard_id,
+      presented_at: now.toISOString(),
+      answered_at: now.toISOString(),
+      rating: rating,
+      next_review_at: nextReviewDate?.toISOString() || null,
+    });
+
+  if (insertError) {
+    // eslint-disable-next-line no-console
+    console.error("Database error recording response:", insertError);
+    throw new Error(`Nie udało się zapisać oceny: ${insertError.message}`);
+  }
+
+  // Step 7: Check if all flashcards have been reviewed - if so, end the session
+  const { count: totalCards } = await supabase
+    .from("flashcards")
+    .select("*", { count: "exact", head: true })
+    .eq("deck_id", session.deck_id);
+
+  const { count: reviewedCards } = await supabase
+    .from("learning_session_responses")
+    .select("*", { count: "exact", head: true })
+    .eq("session_id", sessionId);
+
+  if (totalCards && reviewedCards && reviewedCards >= totalCards) {
+    // End the session
+    await supabase
+      .from("learning_sessions")
+      .update({ ended_at: new Date().toISOString() })
+      .eq("id", sessionId);
+  }
 }

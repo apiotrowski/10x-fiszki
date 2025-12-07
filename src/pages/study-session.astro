@@ -1,0 +1,15 @@
+---
+import Layout from "../layouts/Layout.astro";
+import StudySessionView from "../components/StudySessionView";
+
+// Retrieve the deck_id from query parameters
+const deckId = Astro.url.searchParams.get("deck_id");
+
+if (!deckId) {
+  return Astro.redirect("/decks");
+}
+---
+
+<Layout title="Sesja Nauki">
+  <StudySessionView client:only="react" deckId={deckId} />
+</Layout>

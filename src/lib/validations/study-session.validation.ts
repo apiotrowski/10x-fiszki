@@ -21,3 +21,18 @@ export const sessionIdSchema = z.string().uuid({
 });
 
 export type SessionIdInput = z.infer<typeof sessionIdSchema>;
+
+/**
+ * Validation schema for rating a flashcard
+ * Validates flashcard_id and rating
+ */
+export const rateFlashcardSchema = z.object({
+  flashcard_id: z.string().uuid({
+    message: "Nieprawidłowy format ID fiszki. Musi być prawidłowym UUID.",
+  }),
+  rating: z.enum(["again", "hard", "good", "easy"], {
+    errorMap: () => ({ message: "Ocena musi być jedną z: again, hard, good, easy" }),
+  }),
+});
+
+export type RateFlashcardInput = z.infer<typeof rateFlashcardSchema>;
