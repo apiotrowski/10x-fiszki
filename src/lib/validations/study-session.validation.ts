@@ -11,3 +11,13 @@ export const createStudySessionSchema = z.object({
 });
 
 export type CreateStudySessionInput = z.infer<typeof createStudySessionSchema>;
+
+/**
+ * Validation schema for sessionId path parameter
+ * Validates sessionId as UUID v4 format
+ */
+export const sessionIdSchema = z.string().uuid({
+  message: "Nieprawidłowy format ID sesji. Musi być prawidłowym UUID.",
+});
+
+export type SessionIdInput = z.infer<typeof sessionIdSchema>;

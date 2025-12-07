@@ -179,3 +179,16 @@ export interface StudySessionDTO {
   cards_reviewed: number;
   created_at: LearningSessionRow["started_at"];
 }
+
+// DTO reprezentujący postęp sesji nauki
+export interface StudySessionProgressDTO {
+  cards_reviewed: number;
+  total_cards: number;
+  remaining_cards: number;
+}
+
+// DTO reprezentujący odpowiedź endpointu "get next flashcard"
+export interface GetNextFlashcardResponseDTO {
+  flashcard: Pick<FlashcardDTO, "id" | "type" | "front" | "back">;
+  progress: StudySessionProgressDTO;
+}
