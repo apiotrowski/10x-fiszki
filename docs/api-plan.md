@@ -514,6 +514,16 @@
      8. Flashcards are NOT saved to database at this stage
      9. User can then accept individual flashcards or the entire list (US-002) via the bulk create flashcards endpoint
 
+#### E. Study Session with FSRS
+- **Endpoints:** `/api/study-sessions`, `/api/study-sessions/{sessionId}/next`, `/api/study-sessions/{sessionId}/review`
+- **Business Logic:**
+  - User selects deck to study
+  - System initializes session with FSRS algorithm
+  - Present cards one at a time
+  - Rating options: Again/Hard/Good/Easy
+  - Update FSRS state based on ratings
+  - Save session results
+
 ## 3. Authentication and Authorization
 
 - **Mechanism:** JSON Web Token (JWT) based authentication
