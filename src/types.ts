@@ -5,6 +5,7 @@ import type { Database } from "./db/database.types";
 type DeckRow = Database["public"]["Tables"]["decks"]["Row"];
 type FlashcardRow = Database["public"]["Tables"]["flashcards"]["Row"];
 type GenerationRow = Database["public"]["Tables"]["generations"]["Row"];
+type LearningSessionRow = Database["public"]["Tables"]["learning_sessions"]["Row"];
 
 /*
  * ==========================
@@ -158,4 +159,23 @@ export interface GenerateFlashcardsResponseDTO {
   generation_count: number;
   flashcard_proposals: FlashcardProposalDTO[];
   created_at: GenerationRow["created_at"];
+}
+
+/*
+ * Study Sessions Management
+ */
+
+// Komenda utworzenia sesji nauki
+export interface CreateStudySessionCommand {
+  deck_id: string;
+}
+
+// DTO reprezentujący sesję nauki z metadanymi
+export interface StudySessionDTO {
+  session_id: LearningSessionRow["id"];
+  deck_id: LearningSessionRow["deck_id"];
+  user_id: LearningSessionRow["user_id"];
+  total_cards: number;
+  cards_reviewed: number;
+  created_at: LearningSessionRow["started_at"];
 }
