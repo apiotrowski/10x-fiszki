@@ -38,6 +38,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     limit: url.searchParams.get("limit") || undefined,
     sort: url.searchParams.get("sort") || undefined,
     filter: url.searchParams.get("filter") || undefined,
+    order: url.searchParams.get("order") || undefined,
   };
 
   // Step 2: Validate query parameters with Zod schema
@@ -61,7 +62,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     );
   }
 
-  const { page, limit, sort, filter } = validationResult.data;
+  const { page, limit, sort, filter, order } = validationResult.data;
 
   // Step 3: Call service to list decks with pagination
   try {
@@ -70,6 +71,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
       limit,
       sort,
       filter,
+      order,
     });
 
     // Step 4: Return successful response with decks and pagination (200 OK)

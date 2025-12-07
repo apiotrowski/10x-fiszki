@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { CreateDeckCommand, UpdateDeckCommand, DeckDTO, DeckListDTO, PaginationDTO } from "../../types";
+import type { CreateDeckCommand, UpdateDeckCommand, DeckDTO, DeckListDTO, PaginationDTO, Order } from "../../types";
 
 /**
  * Service for retrieving a deck by its ID
@@ -102,9 +102,9 @@ export async function createDeck(
 export async function listDecks(
   supabase: SupabaseClient,
   userId: string,
-  params: { page: number; limit: number; sort?: string; filter?: string }
+  params: { page: number; limit: number; sort?: string; filter?: string; order?: Order }
 ): Promise<DeckListDTO> {
-  const { page, limit, sort = "created_at", filter } = params;
+  const { page, limit, sort = "created_at", filter, order } = params;
 
   // Calculate offset for pagination
   const offset = (page - 1) * limit;
@@ -122,7 +122,8 @@ export async function listDecks(
 
   // Apply sorting
   const sortColumn = sort as "created_at" | "updated_at" | "title";
-  query = query.order(sortColumn, { ascending: false });
+  const sortOrder = params.order === "asc" ? "asc" : "desc";
+  query = query.order(sortColumn, { ascending: sortOrder === "asc" });
 
   // Apply pagination
   query = query.range(offset, offset + limit - 1);
@@ -155,6 +156,7 @@ export async function listDecks(
     total: count || 0,
     sort,
     filter,
+    order,
   };
 
   return {

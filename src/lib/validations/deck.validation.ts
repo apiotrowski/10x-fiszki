@@ -42,7 +42,7 @@ export const updateDeckSchema = z
 
 /**
  * Validation schema for listing decks query parameters
- * Validates pagination parameters: page, limit, sort, and filter
+ * Validates pagination parameters: page, limit, sort, filter, and order
  */
 export const listDecksQuerySchema = z.object({
   page: z
@@ -59,6 +59,7 @@ export const listDecksQuerySchema = z.object({
     ),
   sort: z.enum(["created_at", "updated_at", "title"]).optional().default("created_at"),
   filter: z.string().optional(),
+  order: z.enum(["asc", "desc"]).optional(),
 });
 
 export type ListDecksQuery = z.infer<typeof listDecksQuerySchema>;

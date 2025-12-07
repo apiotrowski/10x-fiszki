@@ -15,7 +15,7 @@ export function DeckList({ decks, onDeckClick, onDeckDelete }: DeckListProps) {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("pl-PL", {
       year: "numeric",
       month: "short",
       day: "numeric",

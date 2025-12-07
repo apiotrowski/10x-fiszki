@@ -87,11 +87,13 @@ export interface PaginationDTO {
   total: number;
   sort?: string;
   filter?: string;
+  order?: Order;
 }
 
 export type Source = "manual" | "ai-full" | "ai-edited";
 export type Type = "question-answer" | "gaps";
 export type Model = "gpt-4o-mini" | "gpt-4o";
+export type Order = "asc" | "desc";
 
 /*
  * Flashcards Management

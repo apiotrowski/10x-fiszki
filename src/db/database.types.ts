@@ -121,6 +121,83 @@ export interface Database {
         };
         Relationships: [];
       };
+      learning_session_responses: {
+        Row: {
+          answered_at: string;
+          flashcard_id: string;
+          id: string;
+          next_review_at: string | null;
+          presented_at: string;
+          rating: string;
+          session_id: string;
+        };
+        Insert: {
+          answered_at?: string;
+          flashcard_id: string;
+          id?: string;
+          next_review_at?: string | null;
+          presented_at?: string;
+          rating: string;
+          session_id: string;
+        };
+        Update: {
+          answered_at?: string;
+          flashcard_id?: string;
+          id?: string;
+          next_review_at?: string | null;
+          presented_at?: string;
+          rating?: string;
+          session_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "learning_session_responses_flashcard_id_fkey";
+            columns: ["flashcard_id"];
+            isOneToOne: false;
+            referencedRelation: "flashcards";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "learning_session_responses_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "learning_sessions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      learning_sessions: {
+        Row: {
+          deck_id: string;
+          ended_at: string | null;
+          id: string;
+          started_at: string;
+          user_id: string;
+        };
+        Insert: {
+          deck_id: string;
+          ended_at?: string | null;
+          id?: string;
+          started_at?: string;
+          user_id: string;
+        };
+        Update: {
+          deck_id?: string;
+          ended_at?: string | null;
+          id?: string;
+          started_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "learning_sessions_deck_id_fkey";
+            columns: ["deck_id"];
+            isOneToOne: false;
+            referencedRelation: "decks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<never, never>;
     Functions: Record<never, never>;

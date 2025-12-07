@@ -34,6 +34,7 @@ export function useFetchDecks(params: UseFetchDecksParams): UseFetchDecksResult 
       queryParams.append("page", params.page.toString());
       queryParams.append("limit", params.limit.toString());
       queryParams.append("sort", `${params.sort}`); //:${params.order}
+      queryParams.append("order", params.order);
 
       if (params.filter && params.filter.trim()) {
         queryParams.append("filter", params.filter.trim());
@@ -83,7 +84,7 @@ export function useFetchDecks(params: UseFetchDecksParams): UseFetchDecksResult 
       // Stop loading
       setIsLoading(false);
     }
-  }, [params.page, params.limit, params.sort, params.filter]);
+  }, [params.page, params.limit, params.sort, params.filter, params.order]);
 
   return {
     decks,
