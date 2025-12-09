@@ -395,7 +395,7 @@ Interfejs użytkownika został zaprojektowany, aby zapewnić płynne i bezpieczn
   - Ograniczenie możliwości nadpisania `source: "ai-full"` ręcznie
 
 
-### 2.5. Widok sesji nauki
+### 2.5. Widok sesji nauki ✅ ZAIMPLEMENTOWANE
 - **Nazwa widoku:** Sesja Nauki/Recenzji
 - **Ścieżka widoku:** `/study-session`
 - **Główny cel:** Prowadzenie użytkownika przez sesję nauki opartej na algorytmie powtórek, prezentując jedną fiszkę na raz i umożliwiając ocenę przypominania.
