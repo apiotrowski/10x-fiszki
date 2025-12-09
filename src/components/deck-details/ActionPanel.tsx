@@ -6,6 +6,7 @@ interface ActionPanelProps {
   onAddFlashcard?: () => void;
   onAddManualFlashcard?: () => void;
   onStartStudy?: () => void;
+  onViewReport?: () => void;
   isLoading?: boolean;
 }
 
@@ -15,6 +16,7 @@ export function ActionPanel({
   onAddFlashcard,
   onAddManualFlashcard,
   onStartStudy,
+  onViewReport,
   isLoading = false,
 }: ActionPanelProps) {
   return (
@@ -102,6 +104,29 @@ export function ActionPanel({
             <path d="M12 5v14" />
           </svg>
           Dodaj fiszkę
+        </Button>
+      )}
+
+      {/* View report button */}
+      {onViewReport && (
+        <Button variant="outline" onClick={onViewReport} disabled={isLoading} aria-label="Zobacz raport">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mr-2"
+            aria-hidden="true"
+          >
+            <path d="M3 3v18h18" />
+            <path d="m19 9-5 5-4-4-3 3" />
+          </svg>
+          Zobacz raport
         </Button>
       )}
 

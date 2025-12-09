@@ -39,11 +39,11 @@ export async function generateDeckReport(
   // Step 2: Calculate date filter based on period
   const dateFilter = calculateDateFilter(period);
 
-  // Step 3: Get flashcard statistics
-  const statistics = await getFlashcardStatistics(supabase, deckId);
-
   // Step 4: Get last session information
   const lastSession = await getLastSession(supabase, deckId, userId, dateFilter);
+
+  // Step 3: Get flashcard statistics
+  const statistics = await getFlashcardStatistics(supabase, deckId, lastSession?.id || null);
 
   // Step 5: Get rating distribution
   const ratingDistribution = await getRatingDistribution(supabase, deckId, userId, dateFilter);
@@ -94,7 +94,8 @@ function calculateDateFilter(period: ReportPeriod): string | null {
  */
 async function getFlashcardStatistics(
   supabase: SupabaseClient,
-  deckId: string
+  deckId: string,
+  sessionId: string | null
 ): Promise<DeckLearningReportDTO["statistics"]> {
   // Get total count of flashcards
   const { count: totalCount, error: countError } = await supabase
@@ -110,13 +111,34 @@ async function getFlashcardStatistics(
 
   const total = totalCount || 0;
 
+  if (!sessionId) {
+    return {
+      total_flashcards: total,
+      new_flashcards: total,
+      learning_flashcards: 0,
+      mastered_flashcards: 0,
+    };
+  }
+
+  const { count: masteredFlashcardsCount, error: masteredFlashcardsError } = await supabase
+    .from("learning_session_responses")
+    .select("*", { count: "exact", head: true })
+    .eq("rating", "easy")
+    .eq("session_id", sessionId);
+
+  if (masteredFlashcardsError) {
+    // eslint-disable-next-line no-console
+    console.error("Error counting flashcards:", masteredFlashcardsError);
+    throw new Error(`Failed to count flashcards: ${masteredFlashcardsError.message}`);
+  }
+
   // For MVP: All flashcards are considered "new" since we don't have mastery tracking yet
   // TODO: Implement proper mastery tracking based on SM-2 algorithm and next_review_at
   return {
     total_flashcards: total,
     new_flashcards: total,
-    learning_flashcards: 0,
-    mastered_flashcards: 0,
+    learning_flashcards: total - (masteredFlashcardsCount || 0),
+    mastered_flashcards: masteredFlashcardsCount || 0,
   };
 }
 
@@ -180,6 +202,7 @@ async function getLastSession(
   const durationSeconds = Math.round((endTime - startTime) / 1000);
 
   return {
+    id: lastSession.id,
     date: lastSession.started_at,
     duration_seconds: durationSeconds,
     cards_reviewed: cardsReviewed || 0,

@@ -208,6 +208,7 @@ export interface DeckLearningReportDTO {
     mastered_flashcards: number;
   };
   last_session: {
+    id: string;
     date: string;
     duration_seconds: number;
     cards_reviewed: number;

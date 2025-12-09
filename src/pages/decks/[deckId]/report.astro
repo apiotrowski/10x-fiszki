@@ -1,0 +1,17 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import DeckReportView from "../../../components/DeckReportView.tsx";
+
+export const prerender = false;
+
+const { deckId } = Astro.params;
+
+// Validate deckId exists
+if (!deckId) {
+  return Astro.redirect("/decks");
+}
+---
+
+<Layout title="Raport z nauki">
+  <DeckReportView client:load deckId={deckId} />
+</Layout>
