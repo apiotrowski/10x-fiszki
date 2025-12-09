@@ -236,6 +236,99 @@
      - Examples: `/docs/examples/delete-deck-example.md`
      - Test Cases: `/docs/testing/delete-deck-test-cases.md`
 
+6. **Get Deck Learning Report** ✅ IMPLEMENTED
+   - **Method:** GET
+   - **URL:** `/api/decks/{deckId}/report`
+   - **Description:** Retrieve comprehensive learning statistics and progress report for a specific deck.
+   - **Implementation Status:** Fully implemented in `/src/pages/api/decks/[deckId]/report.ts`
+   - **Service Layer:** Uses `generateDeckReport` service from `/src/lib/services/deck-report.service.ts`
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck to generate report for
+   - **Query Parameters:**
+     - `period` (optional, default: "all") - Time period for statistics: "week", "month", or "all"
+   - **Response Payload:**
+     ```json
+     {
+         "deck_id": "uuid",
+         "deck_name": "Deck Title",
+         "statistics": {
+             "total_flashcards": 50,
+             "new_flashcards": 50,
+             "learning_flashcards": 0,
+             "mastered_flashcards": 0
+         },
+         "last_session": {
+             "date": "2025-12-09T10:00:00Z",
+             "duration_seconds": 300,
+             "cards_reviewed": 15
+         },
+         "rating_distribution": {
+             "again": 5,
+             "hard": 8,
+             "good": 20,
+             "easy": 12
+         },
+         "performance": {
+             "average_response_time_seconds": 4.5,
+             "correct_percentage": 71.1
+         },
+         "progress_chart": [
+             {
+                 "date": "2025-12-01",
+                 "mastered_count": 5
+             },
+             {
+                 "date": "2025-12-02",
+                 "mastered_count": 12
+             }
+         ]
+     }
+     ```
+   - **Success Codes:** 200 OK
+   - **Error Codes:**
+     - 400 Bad Request (invalid UUID format or invalid period value)
+     - 401 Unauthorized (not authenticated)
+     - 403 Forbidden (no permission to access deck)
+     - 404 Not Found (deck doesn't exist)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:** (implemented via Zod schemas)
+     - `deckId` must be a valid UUID v4 format (using `deckIdParamSchema`)
+     - `period` must be one of: "week", "month", "all" (using `deckReportQuerySchema`)
+   - **Key Implementation Details:**
+     - Aggregates data from multiple tables: `decks`, `flashcards`, `learning_sessions`, `learning_session_responses`
+     - Calculates statistics based on selected time period
+     - Returns null for `last_session` if no completed sessions exist
+     - Performance metrics calculated from response times and ratings
+     - Progress chart shows cumulative mastered cards over time
+     - For MVP: All flashcards counted as "new" (mastery tracking to be enhanced)
+     - "Correct" answers defined as ratings of "good" or "easy"
+     - Full TypeScript type safety with `DeckLearningReportDTO`
+   - **Security Features:**
+     - Authentication required via JWT token
+     - Authorization check at database level (deck ownership verification)
+     - UUID validation prevents injection attacks
+     - Parameterized queries for SQL injection prevention
+     - Users can only access reports for their own decks
+   - **Performance Optimizations:**
+     - Efficient database queries with proper indexes
+     - Aggregation performed at database level where possible
+     - Date filtering applied early in query chain
+     - Selective field retrieval (only necessary columns)
+     - Database indexes on `user_id`, `deck_id`, `session_id`
+   - **Report Components:**
+     - **Statistics**: Total flashcard counts by learning status
+     - **Last Session**: Most recent completed learning session details
+     - **Rating Distribution**: Count of each rating type across all responses
+     - **Performance**: Average response time and percentage of correct answers
+     - **Progress Chart**: Time-series data showing mastered cards accumulation
+   - **Time Period Filtering:**
+     - `week`: Last 7 days from current date
+     - `month`: Last 30 days from current date
+     - `all`: All historical data (no date filter)
+   - **Documentation:**
+     - Implementation Plan: `/docs/planning/deck-report-implementation-plan.md`
+     - Unit Tests: `/src/lib/services/__tests__/deck-report.service.test.ts`
+
 ### B. Flashcards Management
 
 1. **List Flashcards in a Deck** ✅ IMPLEMENTED
@@ -640,6 +733,76 @@
      - Save review result to database
      - Increment cards_reviewed counter
      - Return updated progress and next review scheduling
+
+4. **Get Deck Learning Report**
+   - **Method:** GET
+   - **URL:** `/api/decks/{deckId}/report`
+   - **Description:** Retrieve learning statistics and progress report for a specific deck.
+   - **Implementation Status:** Not implemented
+   - **Path Parameters:**
+     - `deckId` (required) - UUID of the deck
+   - **Query Parameters:**
+     - `period` (optional) - Time period for statistics: "week", "month", "all" (default: "all")
+   - **Response Payload:**
+     ```json
+     {
+         "deck_id": "uuid",
+         "deck_name": "string",
+         "statistics": {
+             "total_flashcards": 50,
+             "new_flashcards": 15,
+             "learning_flashcards": 20,
+             "mastered_flashcards": 15
+         },
+         "last_session": {
+             "date": "timestamp",
+             "duration_seconds": 300,
+             "cards_reviewed": 10
+         },
+         "rating_distribution": {
+             "again": 5,
+             "hard": 10,
+             "good": 25,
+             "easy": 15
+         },
+         "performance": {
+             "average_response_time_seconds": 12.5,
+             "correct_percentage": 78.5
+         },
+         "progress_chart": [
+             {
+                 "date": "timestamp",
+                 "mastered_count": 10
+             },
+             {
+                 "date": "timestamp",
+                 "mastered_count": 15
+             }
+         ]
+     }
+     ```
+   - **Success Codes:** 200 OK
+   - **Error Codes:**
+     - 400 Bad Request (invalid deckId format or period parameter)
+     - 401 Unauthorized (not authenticated)
+     - 403 Forbidden (user doesn't own the deck)
+     - 404 Not Found (deck doesn't exist)
+     - 500 Internal Server Error (database or unexpected errors)
+   - **Validation Rules:**
+     - `deckId` must be a valid UUID v4 format
+     - `period` must be one of: "week", "month", "all" (if provided)
+     - User must own the deck to access its report
+   - **Business Logic:**
+     - Verify user owns the deck
+     - Query `learning_sessions` table for session history
+     - Query `learning_session_responses` table for review data
+     - Calculate flashcard status distribution based on FSRS state
+     - Aggregate rating distribution from session responses
+     - Calculate average response time and correct percentage
+     - Generate progress chart data points based on selected period
+     - Handle case when no sessions exist (return empty/zero values)
+     - Return comprehensive report with all statistics
+
 
 ## 3. Authentication and Authorization
 

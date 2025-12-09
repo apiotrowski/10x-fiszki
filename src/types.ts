@@ -192,3 +192,45 @@ export interface GetNextFlashcardResponseDTO {
   flashcard: Pick<FlashcardDTO, "id" | "type" | "front" | "back">;
   progress: StudySessionProgressDTO;
 }
+
+/*
+ * Deck Learning Report
+ */
+
+// DTO reprezentujący raport nauki dla talii
+export interface DeckLearningReportDTO {
+  deck_id: string;
+  deck_name: string;
+  statistics: {
+    total_flashcards: number;
+    new_flashcards: number;
+    learning_flashcards: number;
+    mastered_flashcards: number;
+  };
+  last_session: {
+    date: string;
+    duration_seconds: number;
+    cards_reviewed: number;
+  } | null;
+  rating_distribution: {
+    again: number;
+    hard: number;
+    good: number;
+    easy: number;
+  };
+  performance: {
+    average_response_time_seconds: number;
+    correct_percentage: number;
+  };
+  progress_chart: {
+    date: string;
+    mastered_count: number;
+  }[];
+}
+
+// Parametry zapytania dla raportu nauki
+export type ReportPeriod = "week" | "month" | "all";
+
+export interface DeckReportQueryParams {
+  period: ReportPeriod;
+}
