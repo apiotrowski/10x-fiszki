@@ -516,7 +516,7 @@
 
 #### E. Study Session with FSRS
 
-1. **Create Study Session**
+1. **Create Study Session** ✅ IMPLEMENTED
    - **Method:** POST
    - **URL:** `/api/study-sessions`
    - **Description:** Initialize a new study session for a specific deck using the FSRS algorithm.
@@ -555,7 +555,7 @@
      - Create session record in database
      - Return session metadata without presenting first card
 
-2. **Get Next Flashcard**
+2. **Get Next Flashcard** ✅ IMPLEMENTED
    - **Method:** GET
    - **URL:** `/api/study-sessions/{sessionId}/next`
    - **Description:** Retrieve the next flashcard to study in the current session based on FSRS algorithm.

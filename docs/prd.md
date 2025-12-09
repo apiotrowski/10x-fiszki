@@ -173,6 +173,25 @@ Kryteria akceptacji:
 - Interfejs przedstawia użytkownikowi możliwość ręcznego dodawania fiszek.
 - Proces ręcznego tworzenia fiszek działa bez zakłóceń.
 
+### US-008
+ID: US-008  
+Tytuł: Wyświetlanie raportu z nauki dla talii  
+Opis: Jako użytkownik chcę móc wyświetlić raport z moich sesji nauki dla wybranej talii, aby śledzić postępy w nauce i analizować statystyki dotyczące fiszek.  
+Kryteria akceptacji:
+- Użytkownik może wyświetlić raport dla wybranej talii z poziomu widoku szczegółów talii (US-004).
+- Raport zawiera podstawowe statystyki: całkowitą liczbę fiszek w talii, liczbę fiszek nowych, w trakcie nauki i opanowanych.
+- System wyświetla informacje o ostatniej sesji nauki: datę, czas trwania i liczbę przejrzanych fiszek.
+- Raport prezentuje rozkład ocen (Again/Hard/Good/Easy) dla fiszek w ostatnich sesjach.
+- Użytkownik może zobaczyć średni czas odpowiedzi na fiszkę oraz procent poprawnych odpowiedzi.
+- System wyświetla wykres postępów w nauce dla wybranej talii (np. liczba opanowanych fiszek w czasie).
+- Raport jest generowany na podstawie danych z tabeli `learning_sessions` i `learning_session_responses`.
+- Interfejs raportu jest responsywny i dostępny na urządzeniach mobilnych.
+- System obsługuje przypadek braku danych (brak sesji nauki) i wyświetla odpowiedni komunikat.
+- Dane w raporcie są aktualizowane w czasie rzeczywistym po zakończeniu sesji nauki.
+- Endpoint API `/api/decks/{deck_id}/report` zwraca dane raportu w formacie JSON.
+- System waliduje uprawnienia użytkownika do dostępu do raportu wybranej talii.
+
+
 ## 6. Metryki sukcesu
 1. 75-procentowa akceptacja fiszek wygenerowanych przez AI:
    - Mierzenie: stosunek zaakceptowanych fiszek do wszystkich wygenerowanych, monitorowany poprzez logi.
