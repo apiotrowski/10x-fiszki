@@ -13,10 +13,7 @@ interface UseDeckReportReturn {
   refetch: () => Promise<void>;
 }
 
-export function useDeckReport({
-  deckId,
-  period = "all",
-}: UseDeckReportParams): UseDeckReportReturn {
+export function useDeckReport({ deckId, period = "all" }: UseDeckReportParams): UseDeckReportReturn {
   const [report, setReport] = useState<DeckLearningReportDTO | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,8 +54,7 @@ export function useDeckReport({
       const data: DeckLearningReportDTO = await response.json();
       setReport(data);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd";
+      const errorMessage = err instanceof Error ? err.message : "Wystąpił nieoczekiwany błąd";
       setError(errorMessage);
       console.error("Error fetching deck report:", err);
     } finally {
@@ -77,4 +73,3 @@ export function useDeckReport({
     refetch: fetchReport,
   };
 }
-

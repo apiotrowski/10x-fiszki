@@ -4,10 +4,7 @@ import { useEffect } from "react";
  * useKeyboardShortcuts Hook
  * Manages keyboard shortcuts for the application
  */
-export function useKeyboardShortcuts(
-  shortcuts: Record<string, () => void>,
-  enabled: boolean = true
-) {
+export function useKeyboardShortcuts(shortcuts: Record<string, () => void>, enabled = true) {
   useEffect(() => {
     if (!enabled) {
       return;
@@ -16,11 +13,7 @@ export function useKeyboardShortcuts(
     const handleKeyPress = (event: KeyboardEvent) => {
       // Don't trigger shortcuts when user is typing in input/textarea
       const target = event.target as HTMLElement;
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
@@ -40,4 +33,3 @@ export function useKeyboardShortcuts(
     };
   }, [shortcuts, enabled]);
 }
-

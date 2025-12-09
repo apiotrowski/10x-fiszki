@@ -295,16 +295,14 @@ export async function rateFlashcard(
   }
 
   // Step 6: Record the response in learning_session_responses
-  const { error: insertError } = await supabase
-    .from("learning_session_responses")
-    .insert({
-      session_id: sessionId,
-      flashcard_id: flashcard_id,
-      presented_at: now.toISOString(),
-      answered_at: now.toISOString(),
-      rating: rating,
-      next_review_at: nextReviewDate?.toISOString() || null,
-    });
+  const { error: insertError } = await supabase.from("learning_session_responses").insert({
+    session_id: sessionId,
+    flashcard_id: flashcard_id,
+    presented_at: now.toISOString(),
+    answered_at: now.toISOString(),
+    rating: rating,
+    next_review_at: nextReviewDate?.toISOString() || null,
+  });
 
   if (insertError) {
     // eslint-disable-next-line no-console
@@ -325,9 +323,6 @@ export async function rateFlashcard(
 
   if (totalCards && reviewedCards && reviewedCards >= totalCards) {
     // End the session
-    await supabase
-      .from("learning_sessions")
-      .update({ ended_at: new Date().toISOString() })
-      .eq("id", sessionId);
+    await supabase.from("learning_sessions").update({ ended_at: new Date().toISOString() }).eq("id", sessionId);
   }
 }

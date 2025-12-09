@@ -106,4 +106,3 @@ export default function DeckReportView({ deckId }: DeckReportViewProps) {
     </div>
   );
 }
-

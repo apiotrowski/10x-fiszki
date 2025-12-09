@@ -18,11 +18,11 @@ test.describe("Study Session Flow", () => {
     // This is a simplified approach - in a real scenario, you'd use API helpers
     // For now, we'll assume a deck exists and get its ID from the decks page
     await page.waitForURL("/decks");
-    
+
     // Get first deck ID from the page (assuming decks exist)
     const deckLink = page.locator('[href^="/decks/"]').first();
     const href = await deckLink.getAttribute("href");
-    
+
     if (href) {
       deckId = href.split("/")[2]; // Extract deck ID from /decks/{deckId}
     } else {
@@ -72,11 +72,11 @@ test.describe("Study Session Flow", () => {
     // Assert: Wait for next card and verify progress updated
     await studySessionPage.waitForNextFlashcard();
     const newProgress = await studySessionPage.getProgress();
-    
+
     expect(newProgress).not.toBe(initialProgress);
   });
 
-  test("should support keyboard shortcuts for rating", async ({ page }) => {
+  test("should support keyboard shortcuts for rating", async () => {
     // Act: Navigate to study session
     await studySessionPage.goto(deckId);
     await studySessionPage.waitForLoad();
@@ -97,10 +97,10 @@ test.describe("Study Session Flow", () => {
     // Act: Rate multiple flashcards with different ratings
     await studySessionPage.rateFlashcard("easy");
     await studySessionPage.waitForNextFlashcard();
-    
+
     await studySessionPage.rateFlashcard("hard");
     await studySessionPage.waitForNextFlashcard();
-    
+
     await studySessionPage.rateFlashcard("good");
     await studySessionPage.waitForNextFlashcard();
 
@@ -130,7 +130,7 @@ test.describe("Study Session Flow", () => {
         await studySessionPage.rateFlashcard("good");
         await studySessionPage.page.waitForTimeout(1500);
         attempts++;
-      } catch (error) {
+      } catch {
         // If we can't find rating buttons, session might be complete
         break;
       }
@@ -158,7 +158,7 @@ test.describe("Study Session Flow", () => {
         await studySessionPage.rateFlashcard("good");
         await studySessionPage.page.waitForTimeout(1500);
         attempts++;
-      } catch (error) {
+      } catch {
         break;
       }
     }
@@ -188,4 +188,3 @@ test.describe("Study Session Flow", () => {
     await expect(page).toHaveURL("/decks");
   });
 });
-

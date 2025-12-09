@@ -27,4 +27,3 @@ export function TopNavigation({ currentPath }: TopNavigationProps) {
     </Menubar>
   );
 }
-

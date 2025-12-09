@@ -26,7 +26,10 @@ export class StudySessionPage {
     this.page = page;
     this.pageContainer = page.locator(".container");
     this.pageTitle = page.getByRole("heading", { name: "Sesja Nauki" });
-    this.progressIndicator = page.locator("div").filter({ hasText: /Przeglądnięto:/ }).first();
+    this.progressIndicator = page
+      .locator("div")
+      .filter({ hasText: /Przeglądnięto:/ })
+      .first();
     this.flashcardCard = page.locator('[class*="card"]').first();
     this.flashcardFront = page.locator("p").filter({ hasText: /\w+/ }).first();
     this.flipButton = page.getByRole("button", { name: /Pokaż/ });
@@ -140,7 +143,7 @@ export class StudySessionPage {
    * Get progress text
    */
   async getProgress(): Promise<string> {
-    return await this.progressIndicator.textContent() || "";
+    return (await this.progressIndicator.textContent()) || "";
   }
 
   /**
@@ -151,4 +154,3 @@ export class StudySessionPage {
     await this.expectFlashcardVisible();
   }
 }
-
