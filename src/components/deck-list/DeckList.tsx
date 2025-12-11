@@ -57,6 +57,7 @@ export function DeckList({ decks, onDeckClick, onDeckDelete }: DeckListProps) {
               key={deck.id}
               className="cursor-pointer"
               onClick={() => onDeckClick(deck.id)}
+              href-data={`/decks/${deck.id}`}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {

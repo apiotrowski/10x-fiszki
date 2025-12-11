@@ -20,8 +20,8 @@ test.describe("Study Session Flow", () => {
     await page.waitForURL("/decks");
 
     // Get first deck ID from the page (assuming decks exist)
-    const deckLink = page.locator('[href^="/decks/"]').first();
-    const href = await deckLink.getAttribute("href");
+    const deckLink = page.locator('[href-data^="/decks/"]').first();
+    const href = await deckLink.getAttribute("href-data");
 
     if (href) {
       deckId = href.split("/")[2]; // Extract deck ID from /decks/{deckId}
