@@ -1,7 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
+
+// Only load .env.test if not in CI (CI uses environment variables from GitHub secrets)
+if (!process.env.CI) {
+  dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
+}
 
 /**
  * Read environment variables from file.
@@ -75,7 +79,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "npm run dev:e2e",
+    // In CI, use regular dev server (env vars from GitHub secrets)
+    // Locally, use test mode (loads .env.test)
+    command: process.env.CI ? "astro dev --port 54320" : "npm run dev:e2e",
     url: "http://localhost:54320",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
